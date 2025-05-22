@@ -11,6 +11,7 @@
 #include "triton/Tools/LayoutUtils.h"
 #include "llvm/ADT/TypeSwitch.h"
 #include <memory>
+#include <iostream>
 
 using namespace mlir;
 namespace tt = mlir::triton;
@@ -92,6 +93,8 @@ warpsPerTile(Operation *dotOp, ArrayRef<int64_t> shape, int numWarps,
         static_cast<int64_t>(numWarps),
         static_cast<int64_t>(llvm::divideCeil(shape[0], shapePerWarp.first))));
     ret[1] = numWarps / ret[0];
+    //std::cout << "Found tail dot x: " << ret[0] << "y: " << ret[1] << std::endl;
+    //dotOp->dump();
     return ret;
   }
 
@@ -1022,7 +1025,7 @@ public:
     auto CTALayout = ttg::getCTALayout(oldRetEncoding);
 
     // TODO implement heuristic/option for this parameter
-    bool isTransposed = false;
+    bool isTransposed = isChainDotHead(dotOp);//isChainDotTail(dotOp);
     wmmaEnc = ttg::AMDWmmaEncodingAttr::get(ctx, wmmaVersion, isTransposed,
                                             warpsPerTile, CTALayout);
 

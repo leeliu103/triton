@@ -370,6 +370,8 @@ class Config:
 
 def autotune(configs, key, prune_configs_by=None, reset_to_zero=None, restore_value=None, pre_hook=None, post_hook=None,
              warmup=None, rep=None, use_cuda_graph=False, do_bench=None, cache_results=False):
+    print("AUTOTUNING")
+    print(configs[0])
     """
     Decorator for auto-tuning a :code:`triton.jit`'d function.
 

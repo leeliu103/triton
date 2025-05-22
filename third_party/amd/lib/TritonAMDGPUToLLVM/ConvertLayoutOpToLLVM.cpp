@@ -3,6 +3,7 @@
 #include "triton/Conversion/TritonGPUToLLVM/PatternTritonGPUOpToLLVM.h"
 #include "triton/Conversion/TritonGPUToLLVM/Utility.h"
 #include "triton/Dialect/TritonGPU/Transforms/Utility.h"
+#include <iostream>
 
 using ::mlir::triton::gpu::AMDMfmaEncodingAttr;
 using ::mlir::triton::gpu::AMDWmmaEncodingAttr;
@@ -182,9 +183,72 @@ protected:
 
 } // namespace
 
+struct ConvertLayoutOpWMMAToDotOpConversion
+    : public ConvertOpToLLVMPattern<triton::gpu::ConvertLayoutOp> {
+public:
+  explicit ConvertLayoutOpWMMAToDotOpConversion(
+      LLVMTypeConverter &typeConverter, const TargetInfoBase &targetInfo,
+      PatternBenefit benefit)
+      : ConvertOpToLLVMPattern<triton::gpu::ConvertLayoutOp>(typeConverter,
+                                                             benefit),
+        targetInfo(targetInfo) {}
+
+  LogicalResult
+  matchAndRewrite(triton::gpu::ConvertLayoutOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto srcType = cast<RankedTensorType>(op.getSrc().getType());
+    auto dstType = cast<RankedTensorType>(op.getType());
+
+    auto wmmaLayout = dyn_cast<AMDWmmaEncodingAttr>(srcType.getEncoding());
+    auto dotOperandLayout = dyn_cast<DotOperandEncodingAttr>(dstType.getEncoding());
+    if (!wmmaLayout || !dotOperandLayout)
+      return failure();
+
+    auto loc = op.getLoc();
+    auto b = TritonLLVMOpBuilder(loc, rewriter);
+
+    SmallVector<Value> inVals =
+        unpackLLElements(loc, adaptor.getSrc(), rewriter);
+    if (inVals.empty())
+      return failure();
+
+    assert(triton::gpu::lookupThreadsPerWarp(rewriter) == 32 &&
+           "Expected warp size 32 for WMMA");
+
+    Value c32 = b.i32_val(32);
+    Value c16 = b.i32_val(16);
+    Value threadId = getThreadId(rewriter, loc);
+    Value laneId = b.urem(threadId, c32);
+    Value is_lower = b.icmp_slt(laneId, c16);
+
+    SmallVector<Value> outVals;
+    for (Value val : inVals) {
+      // Uncompress a single half VGPR consisting of two rows into two half VGPRs with duplicated data in the upper 16 lanes
+      std::string permlanex16 = "llvm.amdgcn.permlanex16";
+      Value val_swapped = b.bitcast(LLVM::createLLVMIntrinsicCallOp(
+                      rewriter, loc, permlanex16, int_ty(16),
+                      ValueRange{b.bitcast(val, int_ty(16)), b.i32_val(0x01234567), b.i32_val(0x89abcdef)})
+                      ->getResult(0), bf16_ty);
+      outVals.push_back(b.select(is_lower, val, val_swapped));
+      outVals.push_back(b.select(is_lower, val_swapped, val));
+    }
+
+    Value result = packLLElements(loc, getTypeConverter(), outVals, rewriter,
+                                  op.getType());
+    rewriter.replaceOp(op, result);
+    return success();
+  }
+
+protected:
+  const TargetInfoBase &targetInfo;
+};
+
 void mlir::triton::AMD::populateConvertLayoutOpToLLVMPatterns(
     LLVMTypeConverter &typeConverter, const TargetInfo &targetInfo,
     RewritePatternSet &patterns, PatternBenefit benefit) {
   patterns.add<ConvertLayoutOpMFMAToDotOpConversion>(typeConverter, targetInfo,
                                                      benefit);
+  patterns.add<ConvertLayoutOpWMMAToDotOpConversion>(typeConverter, targetInfo,
+                                                     benefit);
+  //std::cout << "populateConvertLayoutOpToLLVMPatterns" << std::endl;
 }

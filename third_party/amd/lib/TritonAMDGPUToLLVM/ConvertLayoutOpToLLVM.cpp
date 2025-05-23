@@ -220,15 +220,25 @@ public:
     Value threadId = getThreadId(rewriter, loc);
     Value laneId = b.urem(threadId, c32);
     Value is_lower = b.icmp_slt(laneId, c16);
+    // Value addrShift16 = b.urem(b.add(laneId, c16), c32);
 
     SmallVector<Value> outVals;
     for (Value val : inVals) {
       // Uncompress a single half VGPR consisting of two rows into two half VGPRs with duplicated data in the upper 16 lanes
       std::string permlanex16 = "llvm.amdgcn.permlanex16";
+      Value valInt16 = b.bitcast(val, int_ty(16));
       Value val_swapped = b.bitcast(LLVM::createLLVMIntrinsicCallOp(
                       rewriter, loc, permlanex16, int_ty(16),
-                      ValueRange{b.bitcast(val, int_ty(16)), b.i32_val(0x01234567), b.i32_val(0x89abcdef)})
+                      ValueRange{valInt16, valInt16, b.i32_val(0x76543210), b.i32_val(0xFEDCBA98), b.true_val(), b.false_val()})
                       ->getResult(0), bf16_ty);
+
+
+      // Value val_swapped = b.bitcast(
+      //       targetInfo.shuffleIdx(rewriter, loc, b.bitcast(val, int_ty(16)),
+      //                             addrShift16), bf16_ty);
+
+      // both permlanex16 & ds_permute approaches are correct
+      // TODO: which one to choose(run benchmarks)
       outVals.push_back(b.select(is_lower, val, val_swapped));
       outVals.push_back(b.select(is_lower, val_swapped, val));
     }

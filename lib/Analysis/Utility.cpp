@@ -740,7 +740,7 @@ bool matchWMMAAndDotOperandShuffleCase(RankedTensorType srcTy,
                                        RankedTensorType dstTy) {
   auto wmmaLayout = dyn_cast<AMDWmmaEncodingAttr>(srcTy.getEncoding());
   auto dotOperandLayout = dyn_cast<DotOperandEncodingAttr>(dstTy.getEncoding());
-  return wmmaLayout && dotOperandLayout;
+  return wmmaLayout && wmmaLayout.getIsTransposed() && dotOperandLayout;
 }
 
 // We get the smallest submap of srcTy^{-1} * dstTy that is not the identity

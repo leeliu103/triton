@@ -3,7 +3,6 @@
 #include "triton/Conversion/TritonGPUToLLVM/PatternTritonGPUOpToLLVM.h"
 #include "triton/Conversion/TritonGPUToLLVM/Utility.h"
 #include "triton/Dialect/TritonGPU/Transforms/Utility.h"
-#include <iostream>
 
 using ::mlir::triton::gpu::AMDMfmaEncodingAttr;
 using ::mlir::triton::gpu::AMDWmmaEncodingAttr;
@@ -220,7 +219,6 @@ public:
     Value threadId = getThreadId(rewriter, loc);
     Value laneId = b.urem(threadId, c32);
     Value is_lower = b.icmp_slt(laneId, c16);
-    // Value addrShift16 = b.urem(b.add(laneId, c16), c32);
 
     SmallVector<Value> outVals;
     for (Value val : inVals) {
@@ -231,14 +229,6 @@ public:
                       rewriter, loc, permlanex16, int_ty(16),
                       ValueRange{valInt16, valInt16, b.i32_val(0x76543210), b.i32_val(0xFEDCBA98), b.true_val(), b.false_val()})
                       ->getResult(0), bf16_ty);
-
-
-      // Value val_swapped = b.bitcast(
-      //       targetInfo.shuffleIdx(rewriter, loc, b.bitcast(val, int_ty(16)),
-      //                             addrShift16), bf16_ty);
-
-      // both permlanex16 & ds_permute approaches are correct
-      // TODO: which one to choose(run benchmarks)
       outVals.push_back(b.select(is_lower, val, val_swapped));
       outVals.push_back(b.select(is_lower, val_swapped, val));
     }

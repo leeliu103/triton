@@ -740,7 +740,12 @@ bool matchWMMAAndDotOperandShuffleCase(RankedTensorType srcTy,
                                        RankedTensorType dstTy) {
   auto wmmaLayout = dyn_cast<AMDWmmaEncodingAttr>(srcTy.getEncoding());
   auto dotOperandLayout = dyn_cast<DotOperandEncodingAttr>(dstTy.getEncoding());
-  return wmmaLayout && wmmaLayout.getIsTransposed() && dotOperandLayout;
+  return wmmaLayout && wmmaLayout.getIsTransposed() && dotOperandLayout &&
+         // We apply chained dot optimization to following combinations:
+         // result type of first dot {FP32}, will be truncated to {FP16, BF16}
+         // operand type of second dot {FP16, BF16}
+         ((srcTy.getElementType().isF16() && dstTy.getElementType().isF16()) ||
+         (srcTy.getElementType().isBF16() && dstTy.getElementType().isBF16()));
 }
 
 // We get the smallest submap of srcTy^{-1} * dstTy that is not the identity

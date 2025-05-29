@@ -226,7 +226,7 @@ public:
       Value val_swapped = b.bitcast(LLVM::createLLVMIntrinsicCallOp(
                       rewriter, loc, permlanex16, int_ty(16),
                       ValueRange{valInt16, valInt16, b.i32_val(0x76543210), b.i32_val(0xFEDCBA98), b.true_val(), b.false_val()})
-                      ->getResult(0), bf16_ty);
+                      ->getResult(0), dstType.getElementType());
       outVals.push_back(b.select(is_lower, val, val_swapped));
       outVals.push_back(b.select(is_lower, val_swapped, val));
     }

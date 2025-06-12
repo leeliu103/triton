@@ -302,7 +302,12 @@ When vec=2, elements are swizzled in pairs of 2.  In other words, the element at
           } else {
             // Do not swizzle in case k dimension is not innermost.
             // In this case accesses will go in different banks even without swizzling.
-            return get(context, 1, 1, 1, order, CTALayout);
+            if (order[0] == 0)
+            {
+              return get(context, 8, 1, 16, order, CTALayout);
+            } else {
+              return get(context, 1, 1, 1, order, CTALayout);
+            }
           }
         }
 

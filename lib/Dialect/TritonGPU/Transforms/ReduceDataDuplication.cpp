@@ -42,6 +42,21 @@ public:
           dyn_cast<triton::gpu::DotOperandEncodingAttr>(dstType.getEncoding());
       if (!dstDotOp)
         return;
+
+      auto func = cvtOp->getParentOfType<triton::FuncOp>();
+      if (func)
+      {
+        auto ctx = func->getContext();
+        auto target = mlir::StringAttr::get(ctx, "moe_gemm_kernel");
+        auto dotLayout = cast<triton::gpu::AMDWmmaEncodingAttr>(dstDotOp.getParent());
+        auto warpsPerCTA = dotLayout.getWarpsPerCTA();
+        if (func->getAttr("sym_name") == target && dstDotOp.getOpIdx() == 1 && warpsPerCTA[0] == 1)
+        {
+            llvm::outs() << "bypass lds";
+            return;
+        }
+      }
+
       if (!cvtNeedsSharedMemory(srcType, dstType))
         return;
       auto order = getOrderForMemory(srcType);

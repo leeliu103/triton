@@ -320,6 +320,88 @@ protected:
   const TargetInfoBase &targetInfo;
 };
 
+struct ConvertLayoutOpWMMAToDotOpConversion
+    : public ConvertOpToLLVMPattern<triton::gpu::ConvertLayoutOp> {
+public:
+  explicit ConvertLayoutOpWMMAToDotOpConversion(
+      LLVMTypeConverter &typeConverter, const TargetInfoBase &targetInfo,
+      PatternBenefit benefit)
+      : ConvertOpToLLVMPattern<triton::gpu::ConvertLayoutOp>(typeConverter,
+                                                             benefit),
+        targetInfo(targetInfo) {}
+
+  LogicalResult
+  matchAndRewrite(triton::gpu::ConvertLayoutOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto srcType = cast<RankedTensorType>(op.getSrc().getType());
+    auto dstType = cast<RankedTensorType>(op.getType());
+
+    if (isa<BlockedEncodingAttr>(srcType.getEncoding()) &&
+        isa<DotOperandEncodingAttr>(dstType.getEncoding())) {
+      return hackBlockedToDotOperand(op, adaptor, rewriter);
+    }
+    return failure();
+  }
+
+protected:
+  const TargetInfoBase &targetInfo;
+
+  LogicalResult
+  hackBlockedToDotOperand(triton::gpu::ConvertLayoutOp op, OpAdaptor adaptor,
+                          ConversionPatternRewriter &rewriter) const {
+    auto loc = op.getLoc();
+    RankedTensorType dstTy = op.getType();
+    auto vals = unpackLLElements(loc, adaptor.getSrc(), rewriter);
+    Value view = packLLElements(loc, getTypeConverter(), vals, rewriter, dstTy);
+    rewriter.replaceOp(op, view);
+    return success();
+
+    // For rdna3, we also need warp shuffling due to the
+    // replication between lane 0-15 and 15-31
+
+    // auto srcType = cast<RankedTensorType>(op.getSrc().getType());
+
+    // auto loc = op.getLoc();
+    // auto b = TritonLLVMOpBuilder(loc, rewriter);
+
+    // SmallVector<Value> inVals =
+    //     unpackLLElements(loc, adaptor.getSrc(), rewriter);
+    // if (inVals.empty())
+    //   return failure();
+
+    // auto valType = srcType.getElementType();
+
+    // Value c32 = b.i32_val(32);
+    // Value c16 = b.i32_val(16);
+    // Value threadId = getThreadId(rewriter, loc);
+    // Value laneId = b.urem(threadId, c32);
+    // Value isLower = b.icmp_slt(laneId, c16);
+
+    // SmallVector<Value> outVals;
+    // for (size_t startIdx = 0; startIdx < inVals.size(); startIdx += 8)
+    // {
+    //   for(size_t offset = 0; offset < 8; ++offset)
+    //   {
+    //     Value val = inVals[startIdx+offset];
+    //     Value valSwapped = targetInfo.shuffleXor(rewriter, loc, val, 16);
+    //     outVals.push_back(b.select(isLower, val, valSwapped));
+    //   }
+
+    //   for(size_t offset = 0; offset < 8; ++offset)
+    //   {
+    //     Value val = inVals[startIdx+offset];
+    //     Value valSwapped = targetInfo.shuffleXor(rewriter, loc, val, 16);
+    //     outVals.push_back(b.select(isLower, valSwapped, val));
+    //   }
+    // }
+
+    // Value result = packLLElements(loc, getTypeConverter(), outVals, rewriter,
+    //                               op.getType());
+    // rewriter.replaceOp(op, result);
+    // return success();
+  }
+};
+
 } // namespace
 
 void mlir::triton::AMD::populateConvertLayoutOpToLLVMPatterns(
@@ -330,4 +412,6 @@ void mlir::triton::AMD::populateConvertLayoutOpToLLVMPatterns(
   patterns.add<ConvertLayoutOpMFMAToLinearConversion>(typeConverter, targetInfo,
                                                       benefit);
   patterns.add<ConvertLayoutForcedPadding>(typeConverter, targetInfo, benefit);
+  patterns.add<ConvertLayoutOpWMMAToDotOpConversion>(typeConverter, targetInfo,
+                                                     benefit);
 }

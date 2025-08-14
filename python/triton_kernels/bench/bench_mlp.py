@@ -8,7 +8,7 @@ import argparse
 import triton_kernels
 import triton_kernels.swiglu
 from triton_kernels.matmul_ogs import matmul_ogs, PrecisionConfig, FlexCtx, FnSpecs, FusedActivation
-from triton_kernels.target_info import is_hip, get_cdna_version
+from triton_kernels.target_info import is_hip, is_cuda, get_cdna_version
 from dataclasses import dataclass
 import distributed as triton_dist
 from triton_kernels.tensor_details import layout
@@ -225,7 +225,7 @@ def roofline_mlp(batch_ranges, dim1, dim2, n_expts_tot, n_expts_act, x_dtype, w_
 
 
 if __name__ == "__main__":
-    has_native_mx4 = torch.cuda.get_device_capability(0)[0] >= 10 or get_cdna_version() == 4
+    has_native_mx4 = (is_cuda() and torch.cuda.get_device_capability(0)[0] >= 10) or get_cdna_version() == 4
     batch_ranges_dense = [(1024, 32768, 1024)]
     batch_ranges_moe = [(128, 512, 32), (512, 32000, 128)]
     dense_dtypes = ["fp8", "fp8"]

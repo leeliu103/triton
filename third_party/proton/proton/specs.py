@@ -16,11 +16,12 @@ amd_bps_by_arch = {
     'gfx90a': 3.2 * 1e12,
     'gfx942': 5.3 * 1e12,
     'gfx950': 8.0 * 1e12,
+    'gfx120': 0.69 * 1e12,
 }
 
 # FP8 Matrix Performance(FLOPS/clock/CU)
 # For gfx90a we use the performance of INT8 since it doesn't support FP8 matrix operations.
-amd_fp8_flops_by_arch = {'gfx90a': 1024, 'gfx942': 4096, 'gfx950': 8192}
+amd_fp8_flops_by_arch = {'gfx90a': 1024, 'gfx942': 4096, 'gfx950': 8192, 'gfx120': 4096}
 
 
 def max_flops(device_type, arch, width, num_sms, clock_rate):

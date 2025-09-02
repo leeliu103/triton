@@ -2,7 +2,7 @@
 # fmt: off
 from dataclasses import dataclass
 import triton
-from triton_kernels.target_info import get_cdna_version
+from triton_kernels.target_info import get_cdna_version, get_rdna_version
 import torch
 from .opt_flags_details import opt_flags_amd, opt_flags_nvidia
 
@@ -97,10 +97,31 @@ def make_default_opt_flags_amd(
         n_cu = torch.cuda.get_device_properties(0).multi_processor_count
         split_k = max(1, n_cu // grid_size)
     # w_cache_modifier:
-    w_cache_modifier = ".cg" if block_m <= 32 else None
+    w_cache_modifier = None
     # num_warps, num_stages
     num_warps = 2 if (m is not None and m <= 16) else 8
     num_stages = 2
+
+    # if m >= 512:
+    #     block_k = block_k // 2
+    # print("rnda version")
+    # print(get_rdna_version())
+    # print(get_rdna_version() != -1)
+    if m >= 512 and get_rdna_version() != -1:
+        block_m = 64
+        block_n = 256
+        block_k = 64
+        num_warps = 8
+        num_stages = 2
+    # print("===============================================================")
+    # print("config")
+    # print(m)
+    # print(block_m)
+    # print(block_n)
+    # print(block_k)
+    # print(num_warps)
+    # print(num_stages)
+    # print("===============================================================")
     # AMD-specific
     target_kernel_kwargs = {"waves_per_eu": 0, "matrix_instr_nonkdim": 16, "kpack": 1}
     ret = OptFlags(

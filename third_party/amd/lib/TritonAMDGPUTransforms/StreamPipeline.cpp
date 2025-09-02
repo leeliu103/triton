@@ -114,6 +114,7 @@ using LoadToInfoMap = llvm::MapVector<Operation *, LoadInfo>;
 
 struct StreamCopyChainOps {
   tt::LoadOp loadOp;
+  mlir::arith::MulFOp scaleOp;
   ttg::MemDescIndexOp subviewOp;
   ttg::LocalStoreOp localStoreOp;
   ttg::LocalLoadOp maybeLocalLoadOp;
@@ -166,6 +167,42 @@ void scheduleLocalLoad(ttg::LocalLoadOp localLoadOp,
   }
 }
 
+Operation* getUniqueUser(Value v) {
+  if (!v.hasOneUse()) return nullptr;
+  auto it = v.getUsers().begin();
+  return it != v.getUsers().end() ? *it : nullptr;
+}
+
+bool isLoadScaled(tt::LoadOp loadOp) {
+  auto cur = loadOp->getResult(0);
+  while (Operation* user = getUniqueUser(cur))
+  {
+    if (dyn_cast<triton::gpu::Fp4ToFpOp>(user))
+      return true;
+    if (user->getNumResults() == 0)
+      return false;
+    cur = user->getResult(0);
+  }
+  return false;
+}
+
+StreamCopyChainOps createScaleStreamCopy(tt::LoadOp loadOp, mlir::arith::MulFOp scaleOp, Value alloc,
+                                    Value extractIdx) {
+  OpBuilder builder(scaleOp);
+  Location loc = scaleOp.getLoc();
+
+  auto viewLoad = triton::createSingleBufferView(builder, alloc, extractIdx)
+                      .getDefiningOp<ttg::MemDescIndexOp>();
+
+  tt::LoadOp newLoadOp = cast<tt::LoadOp>(builder.clone(*loadOp));
+  mlir::arith::MulFOp newScaleOp = cast<mlir::arith::MulFOp>(builder.clone(*scaleOp));
+  auto storeOp = builder.create<ttg::LocalStoreOp>(loc, newScaleOp, viewLoad);
+  auto maybeLocalLoad =
+      tt::replaceUsesWithLocalLoad(builder, scaleOp->getResult(0), viewLoad);
+
+  return {newLoadOp, newScaleOp, viewLoad, storeOp, maybeLocalLoad};
+}
+
 StreamCopyChainOps createStreamCopy(tt::LoadOp loadOp, Value alloc,
                                     Value extractIdx) {
   OpBuilder builder(loadOp);
@@ -179,8 +216,8 @@ StreamCopyChainOps createStreamCopy(tt::LoadOp loadOp, Value alloc,
   auto storeOp = builder.create<ttg::LocalStoreOp>(loc, newLoadOp, viewLoad);
   auto maybeLocalLoad =
       tt::replaceUsesWithLocalLoad(builder, loadOp->getResult(0), viewLoad);
-
-  return {newLoadOp, viewLoad, storeOp, maybeLocalLoad};
+  mlir::arith::MulFOp scaleOp;                                
+  return {newLoadOp, scaleOp, viewLoad, storeOp, maybeLocalLoad};
 }
 
 // Returns the given |inputValue|'s dot user result encoding and updates |opIdx|
@@ -355,10 +392,19 @@ createStreamOps(const LoadToInfoMap &loadToInfo, scf::ForOp &forOp,
     if (!loadOp)
       continue;
 
-    // Create an allocation that can hold distance number of loadOp shapes.
-    auto ty = cast<RankedTensorType>(loadOp->getResultTypes()[0]);
-    Value alloc = triton::createAlloc(forOp, ty, loadOp->getLoc(),
-                                      info.sharedEncoding, numBuffers);
+    Value alloc;
+    auto scaleOp = info.use->getOperand(1).getDefiningOp<mlir::arith::MulFOp>();
+    if (isLoadScaled(loadOp))
+    {
+      auto ty = cast<RankedTensorType>(scaleOp->getResultTypes()[0]);
+      alloc = triton::createAlloc(forOp, ty, scaleOp->getLoc(),
+                                        info.sharedEncoding, numBuffers * 2);
+    } else{
+      // Create an allocation that can hold distance number of loadOp shapes.
+      auto ty = cast<RankedTensorType>(loadOp->getResultTypes()[0]);
+      alloc = triton::createAlloc(forOp, ty, loadOp->getLoc(),
+                                        info.sharedEncoding, numBuffers * 2);
+    }
     assert(alloc && "Failed to create alloc for the async load.");
     auto arch = getAMDArch(loadOp->getParentOfType<ModuleOp>());
     triton::AMD::TargetInfo targetInfo(arch ? arch->str() : "");
@@ -369,7 +415,12 @@ createStreamOps(const LoadToInfoMap &loadToInfo, scf::ForOp &forOp,
                                   targetInfo)) {
       loadToStreamOp[loadOp] = createAsyncCopy(loadOp, alloc, extractIdx);
     } else {
-      loadToStreamOp[loadOp] = createStreamCopy(loadOp, alloc, extractIdx);
+      if (isLoadScaled(loadOp))
+      {
+        loadToStreamOp[loadOp] = createScaleStreamCopy(loadOp, scaleOp, alloc, extractIdx);
+      } else {
+        loadToStreamOp[loadOp] = createStreamCopy(loadOp, alloc, extractIdx);
+      }
     }
   }
 
@@ -385,7 +436,7 @@ preprocessLoop(triton::AMD::ModuleAxisInfoAnalysis &axisInfoAnalysis,
     isaFamily = triton::AMD::deduceISAFamily(*arch);
 
   bool pipelineWithoutDot = forOp->hasAttr(mlir::triton::kNumStagesAttrName);
-  bool filterSmallVectors = isaFamily != triton::AMD::ISAFamily::CDNA4;
+  bool filterSmallVectors = false;
   llvm::MapVector<Operation *, std::pair<int, Operation *>> loadOpToIndLevel =
       triton::gpu::loadOpsToIndirectionLevel(forOp, pipelineWithoutDot,
                                              axisInfoAnalysis, numStages,
@@ -422,6 +473,7 @@ namespace SingleDotSchedule {
 // Note that ttg ops mentioned in the above list are created during scheduling.
 enum SchedType {
   SCHED_GLOBAL_LOAD,
+  SCHED_SCALE,
   SCHED_LOCAL_STORE,
   SCHED_LOCAL_LOAD,
   SCHED_COMPUTE,
@@ -445,9 +497,11 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
                            tt::CoarseSchedule &schedule) {
   int lastStage = numStages - 1;
   stages[SCHED_GLOBAL_LOAD] = 0;
-  stages[SCHED_LOCAL_STORE] = globalPrefetch;
-  stages[SCHED_LOCAL_LOAD] = lastStage - localPrefetch;
-  stages[SCHED_COMPUTE] = lastStage;
+  //stages[SCHED_CONVERT] = 0;
+  stages[SCHED_SCALE] = 0;
+  stages[SCHED_LOCAL_STORE] = 1;
+  stages[SCHED_LOCAL_LOAD] = 1;
+  stages[SCHED_COMPUTE] = 1;
   stages[SCHED_ASYNC_WAIT] = stages[SCHED_LOCAL_LOAD];
 
   bool pairedGlobalLoadLocalStore = stages[SCHED_LOCAL_STORE] == 0;
@@ -505,7 +559,7 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
   //   ttg.local_load must come first
   // else
   //   schedule ttg.local_load in the middle
-  int localLoadCluster = globalLoadCluster;
+  int localLoadCluster = globalLoadCluster+1;
   if (stages[SCHED_LOCAL_LOAD] == stages[SCHED_LOCAL_STORE]) {
     localLoadCluster = std::max(3, localStoreCluster + 1);
   } else if (numBuffers == 1 && localLoadCluster >= localStoreCluster) {
@@ -520,18 +574,28 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
     computeCluster = localLoadCluster;
   }
 
+  globalLoadCluster = 1;
+  localStoreCluster = 2;
+  computeCluster = 3;
+  localLoadCluster = 2;
+  int scaleCluster = 4;
+  //int convertCluster = 4;
+
   // Make assignments
   Clusters clusterVec;
   std::generate(clusterVec.begin(), clusterVec.end(),
                 [&]() { return schedule.clusters.newAtBack(); });
 
   clusters[SCHED_GLOBAL_LOAD] = clusterVec[globalLoadCluster];
+  //clusters[SCHED_CONVERT] = clusterVec[convertCluster];
+  clusters[SCHED_SCALE] = clusterVec[scaleCluster];
   clusters[SCHED_LOCAL_STORE] = clusterVec[localStoreCluster];
   clusters[SCHED_LOCAL_LOAD] = clusterVec[localLoadCluster];
   clusters[SCHED_COMPUTE] = clusterVec[computeCluster];
   clusters[SCHED_ASYNC_WAIT] = clusterVec[asyncWaitCluster];
 
   LDBG("Cluster schedule:" << "  GLOBAL_LOAD cluster = " << globalLoadCluster
+                           << ", SCALE cluster = " << scaleCluster
                            << ", LOCAL_STORE cluster = " << localStoreCluster
                            << ", LOCAL_LOAD cluster = " << localLoadCluster
                            << ", COMPUTE cluster = " << computeCluster
@@ -569,10 +633,19 @@ void scheduleAsyncCopy(const AsyncCopyChainOps &asyncOps, tt::LoadOp loadOp,
 void scheduleStreamCopy(const StreamCopyChainOps &streamOps,
                         tt::LoadOp oldLoadOp, tt::CoarseSchedule &schedule,
                         const Stages &stages, const Clusters &clusters) {
-  auto [newLoadOp, subviewOp, localStoreOp, maybeLocalLoadOp] = streamOps;
+  auto [newLoadOp, newScaleOp, subviewOp, localStoreOp, maybeLocalLoadOp] = streamOps;
   auto [loadStage, loadCluster] = schedule[oldLoadOp];
 
-  schedule.insert(newLoadOp, loadStage, loadCluster);
+  if (isLoadScaled(oldLoadOp))
+  {
+    // auto convertOp = getUniqueUser(getUniqueUser(oldLoadOp->getResult(0))->getResult(0));
+    // schedule.insert(convertOp, stages[SCHED_CONVERT], clusters[SCHED_CONVERT]);
+
+    schedule.insert(newScaleOp, stages[SCHED_SCALE], clusters[SCHED_SCALE]);
+  } else{
+    schedule.insert(newLoadOp, loadStage, loadCluster);
+  }
+
   schedule.insert(subviewOp, stages[SCHED_LOCAL_STORE],
                   clusters[SCHED_LOCAL_STORE]);
   schedule.insert(localStoreOp, stages[SCHED_LOCAL_STORE],
@@ -875,7 +948,7 @@ void scheduleStreamCopy(const StreamCopyChainOps &streamOps, tt::LoadOp loadOp,
                         tt::CoarseSchedule &schedule,
                         const ChainedDotClusters &clusters) {
   auto [loadStage, loadCluster] = schedule[loadOp];
-  auto [copyOp, subviewOp, localStoreOp, maybeLocalLoadOp] = streamOps;
+  auto [copyOp, scaleOp, subviewOp, localStoreOp, maybeLocalLoadOp] = streamOps;
   schedule.insert(copyOp, loadStage, loadCluster);
 
   if (loadStage == STAGE_GLOBAL_LOAD_1) {

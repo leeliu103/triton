@@ -64,6 +64,20 @@ def get_cdna_version():
         return 4
     return -1
 
+def get_rdna_version():
+    """
+    Gets the AMD architecture version, i.e. RDNA3 or RDNA4, currently
+    only supports 3 (gfx1100) or 4 (gfx1201). Returns -1 if it is not AMD
+    hardware or unsupported architecture
+    """
+    target = triton.runtime.driver.active.get_current_target()
+    if target.backend != 'hip':
+        return -1
+    if target.arch == 'gfx1100':
+        return 3
+    if target.arch == 'gfx1201':
+        return 4
+    return -1
 
 def has_tma_gather():
     return cuda_capability_geq(10, 0)

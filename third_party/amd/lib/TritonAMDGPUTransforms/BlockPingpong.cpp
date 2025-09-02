@@ -45,6 +45,7 @@ class Pingponger {
   SmallVector<ttg::AsyncCommitGroupOp> asyncCommitOps;
   SmallVector<tt::DotOp> dotOps;
   SmallVector<tt::DotScaledOp> scaledDotOps;
+  SmallVector<ttg::Fp4ToFpOp> fp4TofpOps;
   SmallVector<SmallVector<Operation *>> subViewOps;
   SmallVector<SmallVector<Operation *>> loadSliceOps;
   SmallVector<Operation *> dotSliceOps;
@@ -383,27 +384,62 @@ void Pingponger::determineDotMemoryOps(
 // high-level operations, inserting `setPrio` also has a same effect of
 // instruction scheduling boundary, too.
 void Pingponger::transformOnePPClusters(OpBuilder &builder, Location loc) {
-  auto dotLoc = dotOps[0]->getPrevNode();
-  // sched barrier to prevent memory ops from cross but leave other ops to be
-  // scheduled across the barrier.
-  auto preDotBar = builder.create<ROCDL::SchedBarrier>(loc, 1);
-  updateOpInsertion(dotLoc);
-  appendOp(preDotBar);
+  // auto dotLoc = dotOps[0]->getPrevNode();
+  // // sched barrier to prevent memory ops from cross but leave other ops to be
+  // // scheduled across the barrier.
+  // auto preDotBar = builder.create<ROCDL::SchedBarrier>(loc, 1);
+  // updateOpInsertion(dotLoc);
+  // appendOp(preDotBar);
 
-  // Memory cluster #0
-  updateOpInsertion(lLoadOps[0]);
+  // // Memory cluster #0
+  // updateOpInsertion(lLoadOps[0]);
+  // appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
+  // moveOpAndPredecessorsUpSameBlock(gLoadOps[0]);
+  // appendOp(builder.create<ROCDL::SchedBarrier>(loc, 0));
+  // moveOpAndPredecessorsUpSameBlock(lLoadOps[1]);
+  // appendOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority));
+  // moveOpAndPredecessorsUpSameBlock(gLoadOps[1]);
+
+  // // Dot cluster #0
+  // updateOpInsertion(preDotBar);
+  // appendOpWithPrio(builder, dotOps[0], loc);
+  // // Add a remark for user feedback
+
+  updateOpInsertion(dotOps[0]->getPrevNode());
+  appendClusterBarrier(builder, loc);
   appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
-  moveOpAndPredecessorsUpSameBlock(gLoadOps[0]);
-  appendOp(builder.create<ROCDL::SchedBarrier>(loc, 0));
-  moveOpAndPredecessorsUpSameBlock(lLoadOps[1]);
-  appendOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority));
-  moveOpAndPredecessorsUpSameBlock(gLoadOps[1]);
 
-  // Dot cluster #0
-  updateOpInsertion(preDotBar);
-  appendOpWithPrio(builder, dotOps[0], loc);
+  updateOpInsertion(lastInsertedOp->getBlock()->getTerminator());
+  prependOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority), false);
+  prependClusterBarrier(builder, loc);
   // Add a remark for user feedback
-  dotOps[0]->emitRemark() << "Performed one ping pong cluster transformation\n";
+
+
+  llvm::outs() << "transformOnePPClusters";
+  // builder.setInsertionPointAfter(gLoadOps[0]);
+  // updateOpInsertion(gLoadOps[0]);
+  // appendOp(gLoadOps[1]);
+  // appendOp(gLoadOps[2]);
+  // appendClusterBarrier(builder, loc);
+
+  // appendOpWithPrio(builder, fp4TofpOps[0], loc);
+  // appendClusterBarrier(builder, loc);
+
+  // appendOp(lLoadOps[0]);
+  // appendOp(lLoadOps[1]);
+  // appendClusterBarrier(builder, loc);
+
+  // appendOpWithPrio(builder, dotOps[0], loc);
+  // appendClusterBarrier(builder, loc);
+
+  // moveOpAndPredecessorsUpSameBlock(lStoreOps[0]);
+  // moveOpAndPredecessorsUpSameBlock(lStoreOps[1]);
+  // appendClusterBarrier(builder, loc);
+
+
+
+  // Add a remark for user feedback
+  fp4TofpOps[0]->emitRemark() << "Performed one ping pong cluster transformation\n";
 }
 
 void Pingponger::genOffsetConstants(Location loc, OpBuilder &builder,
@@ -850,11 +886,12 @@ void Pingponger::getDotPingponged() {
           // This scheduling doesn't help hiding intra-warp latency. So, we only
           // collect local_load ops that are software pipelined, which means
           // their source is from loop carried values
-          auto src = lLoad.getSrc();
-          if (auto arg = mlir::dyn_cast<BlockArgument>(src))
-            if (auto tiedLoopInit = forOp.getTiedLoopInit(arg))
-              if (tiedLoopInit->get())
-                lLoadOps.push_back(lLoad);
+          // auto src = lLoad.getSrc();
+          // if (auto arg = mlir::dyn_cast<BlockArgument>(src))
+          //   if (auto tiedLoopInit = forOp.getTiedLoopInit(arg))
+          //     if (tiedLoopInit->get())
+          //       lLoadOps.push_back(lLoad);
+          lLoadOps.push_back(lLoad);
         })
         .Case<ttg::LocalStoreOp>(
             [&](auto lStore) { lStoreOps.push_back(lStore); })
@@ -868,7 +905,9 @@ void Pingponger::getDotPingponged() {
           asyncCommitOps.push_back(asyncCommitGroupOp);
         })
         .Case<ttg::AsyncWaitOp>(
-            [&](auto asyncOp) { asyncWaitOps.push_back(asyncOp); });
+            [&](auto asyncOp) { asyncWaitOps.push_back(asyncOp); })
+        .Case<ttg::Fp4ToFpOp>(
+            [&](auto fp4TofpOp) { fp4TofpOps.push_back(fp4TofpOp); });
   });
 
   // Currently, pingpong scheduling is known as helpful under limited condition.
@@ -879,10 +918,25 @@ void Pingponger::getDotPingponged() {
 
   int64_t numOfDotLikeOps = scaledDotOps.size() + dotOps.size();
 
+  // llvm::outs() << "[pp] forOp:\n";
+  // forOp->print(llvm::outs(), mlir::OpPrintingFlags().useLocalScope());
+  // llvm::outs() << "\n";
+
+  // llvm::outs() << "numOfDotLikeOps:";
+  // llvm::outs() << dotOps.size();
+  // llvm::outs() << "\n";
+
+
+  if (fp4TofpOps.size() > 0)
+      llvm::outs() << "getDotPingponged 1\n";
+
   if (numOfDotLikeOps < 1 || numOfDotLikeOps > 2) {
     LDBG("Only handle one or two dotlike ops");
     return;
   }
+
+  if (fp4TofpOps.size() > 0)
+      llvm::outs() << "getDotPingponged 2\n";
 
   if (numOfDotLikeOps == 2) {
     if (numStages != 4)
@@ -900,6 +954,17 @@ void Pingponger::getDotPingponged() {
   int64_t gloadSize = useAsyncCopy ? asyncCopyOps.size() : gLoadOps.size();
   int64_t dotSize =
       scaledDotOps.size() > 0 ? scaledDotOps.size() : dotOps.size();
+
+  if (fp4TofpOps.size() > 0)
+  {
+    llvm::outs() << "getDotPingponged 3\n";
+    llvm::outs() << gloadSize;
+    llvm::outs() << "\n";
+    llvm::outs() << lLoadOps.size();
+    llvm::outs() << "\n";
+    llvm::outs() << dotSize;
+    llvm::outs() << "\n";
+  }
   if ((gloadSize < 2 || lLoadOps.size() < 2 || dotSize != 1)) {
     std::stringstream message;
     message << "Unable to match ping pong scheduling pattern. Details: "
@@ -908,8 +973,10 @@ void Pingponger::getDotPingponged() {
     LDBG(message.str());
     return;
   }
-
   // dot_scaled case
+
+  if (fp4TofpOps.size() > 0)
+    llvm::outs() << "getDotPingponged 4\n";
 
   if (scaledDotOps.size() == 1 && numWarps == 8 && numStages == 2 &&
       asyncCopyOps.size() > 0) {
@@ -936,6 +1003,9 @@ void Pingponger::getDotPingponged() {
 
   // dot case
 
+  if (fp4TofpOps.size() > 0)
+    llvm::outs() << "getDotPingponged 5\n";
+
   // Determine if we have a persistent GEMM. This will decide how we interpret
   // any memory operations that we find in conditionals.
   auto assumeNotTaken = isPersistentGemm(dotOps.size());
@@ -955,10 +1025,10 @@ void Pingponger::getDotPingponged() {
   auto encoding = cast<RankedTensorType>(aType).getEncoding();
   auto srcEncoding = cast<ttg::DotOperandEncodingAttr>(encoding);
   kWidth = srcEncoding.getKWidth();
-  auto mfmaEncoding = cast<ttg::AMDMfmaEncodingAttr>(srcEncoding.getParent());
+  auto wmmaEncoding = cast<ttg::AMDWmmaEncodingAttr>(srcEncoding.getParent());
   SmallVector<int64_t> intShape;
-  intShape.push_back(mfmaEncoding.getMDim());
-  intShape.push_back(mfmaEncoding.getNDim());
+  intShape.push_back(wmmaEncoding.getMNKDimPerInstr()[0]);
+  intShape.push_back(wmmaEncoding.getMNKDimPerInstr()[1]);
 
   if (dotOps.size() == 1 && useAsyncCopy) {
     if (numWarps != 8) {
@@ -1001,30 +1071,30 @@ void Pingponger::getDotPingponged() {
                             [&dotLocalStores](ttg::LocalStoreOp op) {
                               return dotLocalStores.contains(op);
                             });
-  if (estimateNonDotMemoryImpact<tt::LoadOp>(gLoadIt, gLoadOps.end(),
-                                             assumeNotTaken) != 0) {
-    std::stringstream message;
-    message << "Unable to match ping pong scheduling pattern. Details: "
-            << "Non-dot global loads found in non-persistent GEMM";
-    LDBG(message.str());
-    return;
-  }
-  if (estimateNonDotMemoryImpact<ttg::LocalLoadOp>(lLoadIt, lLoadOps.end(),
-                                                   assumeNotTaken) != 0) {
-    std::stringstream message;
-    message << "Unable to match ping pong scheduling pattern. Details: "
-            << "Non-dot local loads found in non-persistent GEMM";
-    LDBG(message.str());
-    return;
-  }
-  if (estimateNonDotMemoryImpact<ttg::LocalStoreOp>(lStoreIt, lStoreOps.end(),
-                                                    assumeNotTaken) != 0) {
-    std::stringstream message;
-    message << "Unable to match ping pong scheduling pattern. Details: "
-            << "Non-dot local stores found in non-persistent GEMM";
-    LDBG(message.str());
-    return;
-  }
+  // if (estimateNonDotMemoryImpact<tt::LoadOp>(gLoadIt, gLoadOps.end(),
+  //                                            assumeNotTaken) != 0) {
+  //   std::stringstream message;
+  //   message << "Unable to match ping pong scheduling pattern. Details: "
+  //           << "Non-dot global loads found in non-persistent GEMM";
+  //   LDBG(message.str());
+  //   return;
+  // }
+  // if (estimateNonDotMemoryImpact<ttg::LocalLoadOp>(lLoadIt, lLoadOps.end(),
+  //                                                  assumeNotTaken) != 0) {
+  //   std::stringstream message;
+  //   message << "Unable to match ping pong scheduling pattern. Details: "
+  //           << "Non-dot local loads found in non-persistent GEMM";
+  //   LDBG(message.str());
+  //   return;
+  // }
+  // if (estimateNonDotMemoryImpact<ttg::LocalStoreOp>(lStoreIt, lStoreOps.end(),
+  //                                                   assumeNotTaken) != 0) {
+  //   std::stringstream message;
+  //   message << "Unable to match ping pong scheduling pattern. Details: "
+  //           << "Non-dot local stores found in non-persistent GEMM";
+  //   LDBG(message.str());
+  //   return;
+  // }
 
   // Remove non-dot memory operations.
   gLoadOps.erase(gLoadIt, gLoadOps.end());
@@ -1032,14 +1102,14 @@ void Pingponger::getDotPingponged() {
   lStoreOps.erase(lStoreIt, lStoreOps.end());
   // All PingPong Scheduler assumes there are 2 movable global loads and 2
   // movable local loads.
-  if (gLoadOps.size() != 2 || lLoadOps.size() != 2) {
-    std::stringstream message;
-    message << "Unable to match ping pong slicing pattern. Details: "
-            << gLoadOps.size() << " global loads in dot computation, "
-            << lLoadOps.size() << " local loads in dot computation";
-    LDBG(message.str());
-    return;
-  }
+  // if (gLoadOps.size() != 2 || lLoadOps.size() != 2) {
+  //   std::stringstream message;
+  //   message << "Unable to match ping pong slicing pattern. Details: "
+  //           << gLoadOps.size() << " global loads in dot computation, "
+  //           << lLoadOps.size() << " local loads in dot computation";
+  //   LDBG(message.str());
+  //   return;
+  // }
 
   // Pingpong scheduling tries to form two different types of the instruction
   // clusters, i.e., Dot clusters and Memory clusters. While each SIMD has
@@ -1069,13 +1139,14 @@ void Pingponger::getDotPingponged() {
   // N.B., Tile size smaller than 128x128x64_FP16 is likely not compute-bound
   // that pingpong scheduling doesn't help much.
 
-  if (numWarps == 4) { // Pingpong between warps from different blocks
+  if (numWarps == 8 || numWarps == 4) { // Pingpong between warps from different blocks
     // Transform a loop with small tile size.
     // We've observed that this small tile size spent almost equivalent cycle
     // times for issuing the memory operations and issuing dot operations,
     // smaller tile sizes are not likely to get any advantage from current dot
     // centric pingpong scheduling.
-    if (tileSize <= smallTile && tileSize >= minTile)
+    //if (tileSize <= smallTile && tileSize >= minTile)
+    if (fp4TofpOps.size() > 0)
       transformOnePPClusters(builder, loc);
     // numWarps=4 doesn't need asymmetric sync, return.
     return;

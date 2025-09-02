@@ -76,6 +76,11 @@ std::string translateLLVMIRToASM(llvm::Module &module,
   using namespace mlir;
   // options
   auto options = llvm::cl::getRegisteredOptions();
+
+  // auto *strPtr = static_cast<llvm::cl::opt<std::string> *>(options["amdgpu-sched-strategy"]);
+  // assert(strPtr);
+  // strPtr->setValue("max-ilp");
+
   for (std::string flag : flags) {
     auto *shortPtr = static_cast<llvm::cl::opt<bool> *>(options[flag]);
     assert(shortPtr);

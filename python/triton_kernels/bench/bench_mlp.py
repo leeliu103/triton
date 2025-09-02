@@ -227,7 +227,8 @@ def roofline_mlp(batch_ranges, dim1, dim2, n_expts_tot, n_expts_act, x_dtype, w_
 if __name__ == "__main__":
     has_native_mx4 = (is_cuda() and torch.cuda.get_device_capability(0)[0] >= 10) or get_cdna_version() == 4
     batch_ranges_dense = [(1024, 32768, 1024)]
-    batch_ranges_moe = [(128, 129, 1)]#[(128, 512, 32), (512, 4096, 128)]
+    batch_ranges_moe = [(4096, 4097, 1)]
+    #batch_ranges_moe = [(128, 512, 32), (512, 4096, 128)]
     dense_dtypes = ["fp8", "fp8"]
     quantized_dtypes = ["fp8", "mx4"] if has_native_mx4 else ["bf16", "mx4"]
     rank, world_size = triton_dist.setup()

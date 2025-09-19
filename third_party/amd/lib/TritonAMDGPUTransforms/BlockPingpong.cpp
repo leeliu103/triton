@@ -405,15 +405,39 @@ void Pingponger::transformOnePPClusters(OpBuilder &builder, Location loc) {
   // appendOpWithPrio(builder, dotOps[0], loc);
   // // Add a remark for user feedback
 
-  updateOpInsertion(dotOps[0]->getPrevNode());
-  appendClusterBarrier(builder, loc);
-  appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
+  // updateOpInsertion(dotOps[0]->getPrevNode());
+  // appendClusterBarrier(builder, loc);
+  // appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
 
-  updateOpInsertion(lastInsertedOp->getBlock()->getTerminator());
-  prependOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority), false);
-  prependClusterBarrier(builder, loc);
+  // updateOpInsertion(lastInsertedOp->getBlock()->getTerminator());
+  // prependOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority), false);
+  // prependClusterBarrier(builder, loc);
   // Add a remark for user feedback
 
+  updateOpInsertion(fp4TofpOps[0]->getPrevNode());
+  appendClusterBarrier(builder, loc);
+
+  appendOpWithPrio(builder, fp4TofpOps[0], loc);
+  appendClusterBarrier(builder, loc);
+
+
+  updateOpInsertion(lStoreOps[1]);
+  appendClusterBarrier(builder, loc);
+
+  appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
+
+  updateOpInsertion(lLoadOps[0]->getPrevNode());
+
+  appendOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority));
+  appendClusterBarrier(builder, loc);
+
+  updateOpInsertion(dotOps[0]->getPrevNode());
+  appendClusterBarrier(builder, loc);
+
+  appendOpWithPrio(builder, dotOps[0], loc);
+
+  updateOpInsertion(lastInsertedOp->getBlock()->getTerminator());
+  prependClusterBarrier(builder, loc);
 
   // llvm::outs() << "transformOnePPClusters";
   // builder.setInsertionPointAfter(gLoadOps[0]);

@@ -108,10 +108,10 @@ def make_default_opt_flags_amd(
     # print(get_rdna_version())
     # print(get_rdna_version() != -1)
     if m >= 512 and get_rdna_version() != -1:
-        block_m = 64
-        block_n = 256
-        block_k = 64
-        num_warps = 8
+        block_m = 128
+        block_n = 128
+        block_k = 32
+        num_warps = 4
         num_stages = 2
     # print("===============================================================")
     # print("config")

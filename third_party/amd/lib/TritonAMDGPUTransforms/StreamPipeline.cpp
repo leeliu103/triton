@@ -385,25 +385,29 @@ createStreamOps(const LoadToInfoMap &loadToInfo, scf::ForOp &forOp,
 
   LoadToStreamOpMap loadToStreamOp;
   for (auto &[l, info] : loadToInfo) {
-    if (!info.sharedEncoding)
-      continue;
 
     auto loadOp = dyn_cast<tt::LoadOp>(l);
     if (!loadOp)
       continue;
 
+    if (!info.sharedEncoding && !isLoadScaled(loadOp))
+      continue;
+
     Value alloc;
-    auto scaleOp = info.use->getOperand(1).getDefiningOp<mlir::arith::MulFOp>();
+    //auto scaleOp = info.use->getOperand(1).getDefiningOp<mlir::arith::MulFOp>();
+    auto convertOp = info.use->getOperand(1).getDefiningOp();
+    auto scaleOp = convertOp->getOperand(0).getDefiningOp<mlir::arith::MulFOp>();
     if (isLoadScaled(loadOp))
     {
+      auto sharedEncoding = getSharedEncIfAllUsersAreDotEnc(scaleOp->getResult(0)).value_or(nullptr);
       auto ty = cast<RankedTensorType>(scaleOp->getResultTypes()[0]);
       alloc = triton::createAlloc(forOp, ty, scaleOp->getLoc(),
-                                        info.sharedEncoding, numBuffers * 2);
+                                        sharedEncoding, numBuffers * 3);
     } else{
       // Create an allocation that can hold distance number of loadOp shapes.
       auto ty = cast<RankedTensorType>(loadOp->getResultTypes()[0]);
       alloc = triton::createAlloc(forOp, ty, loadOp->getLoc(),
-                                        info.sharedEncoding, numBuffers * 2);
+                                        info.sharedEncoding, numBuffers * 3);
     }
     assert(alloc && "Failed to create alloc for the async load.");
     auto arch = getAMDArch(loadOp->getParentOfType<ModuleOp>());
@@ -473,6 +477,7 @@ namespace SingleDotSchedule {
 // Note that ttg ops mentioned in the above list are created during scheduling.
 enum SchedType {
   SCHED_GLOBAL_LOAD,
+  SCHED_CONVERT,
   SCHED_SCALE,
   SCHED_LOCAL_STORE,
   SCHED_LOCAL_LOAD,
@@ -497,7 +502,7 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
                            tt::CoarseSchedule &schedule) {
   int lastStage = numStages - 1;
   stages[SCHED_GLOBAL_LOAD] = 0;
-  //stages[SCHED_CONVERT] = 0;
+  stages[SCHED_CONVERT] = 0;
   stages[SCHED_SCALE] = 0;
   stages[SCHED_LOCAL_STORE] = 1;
   stages[SCHED_LOCAL_LOAD] = 1;
@@ -575,11 +580,11 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
   }
 
   globalLoadCluster = 1;
-  localStoreCluster = 2;
-  computeCluster = 3;
-  localLoadCluster = 2;
+  localStoreCluster = 3;
+  computeCluster = 6;
+  localLoadCluster = 5;
   int scaleCluster = 4;
-  //int convertCluster = 4;
+  int convertCluster = 2;
 
   // Make assignments
   Clusters clusterVec;
@@ -587,7 +592,7 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
                 [&]() { return schedule.clusters.newAtBack(); });
 
   clusters[SCHED_GLOBAL_LOAD] = clusterVec[globalLoadCluster];
-  //clusters[SCHED_CONVERT] = clusterVec[convertCluster];
+  clusters[SCHED_CONVERT] = clusterVec[convertCluster];
   clusters[SCHED_SCALE] = clusterVec[scaleCluster];
   clusters[SCHED_LOCAL_STORE] = clusterVec[localStoreCluster];
   clusters[SCHED_LOCAL_LOAD] = clusterVec[localLoadCluster];
@@ -638,8 +643,8 @@ void scheduleStreamCopy(const StreamCopyChainOps &streamOps,
 
   if (isLoadScaled(oldLoadOp))
   {
-    // auto convertOp = getUniqueUser(getUniqueUser(oldLoadOp->getResult(0))->getResult(0));
-    // schedule.insert(convertOp, stages[SCHED_CONVERT], clusters[SCHED_CONVERT]);
+    auto convertOp = getUniqueUser(getUniqueUser(oldLoadOp->getResult(0))->getResult(0));
+    schedule.insert(convertOp, stages[SCHED_CONVERT], clusters[SCHED_CONVERT]);
 
     schedule.insert(newScaleOp, stages[SCHED_SCALE], clusters[SCHED_SCALE]);
   } else{

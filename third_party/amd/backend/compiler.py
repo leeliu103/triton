@@ -7,6 +7,7 @@ from types import ModuleType
 import hashlib
 import tempfile
 import re
+import os
 import functools
 import warnings
 from pathlib import Path
@@ -421,6 +422,13 @@ class HIPBackend(BaseBackend):
             flags.append('sink-insts-to-avoid-spills')
         amdgcn = llvm.translate_to_asm(src, amd.TARGET_TRIPLE, options.arch, '+cumode', flags, options.enable_fp_fusion, False)
         #amdgcn = llvm.translate_to_asm(src, amd.TARGET_TRIPLE, options.arch, '', flags, options.enable_fp_fusion, False)
+        if "AMD_INSERT_AMDGCN" in os.environ.keys() and metadata["name"] == "_matmul_ogs_NNT_bf16xbf16xmxfp4_128x128x32x1_swiglu":
+            insert_module_path = str(os.environ["AMD_INSERT_AMDGCN"])
+            if not os.path.exists(insert_module_path):
+                raise RuntimeError(f'cannot find amdgcn file to insert. Given: `{insert_module_path}`')
+            with open(insert_module_path, "r") as file:
+                file_content = file.readlines()
+            amdgcn = ''.join(file_content)
         if knobs.amd.dump_amdgcn:
             print("// -----// AMDGCN Dump //----- //")
             print(amdgcn)

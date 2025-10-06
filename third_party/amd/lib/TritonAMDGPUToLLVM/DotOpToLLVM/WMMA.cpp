@@ -266,6 +266,7 @@ Value generateWMMAOp(ConversionPatternRewriter &rewriter, Location loc,
 LogicalResult convertDot(DotOp op, DotOpAdaptor adaptor,
                          ConversionPatternRewriter &rewriter,
                          const LLVMTypeConverter *typeConverter) {
+  auto setPrioOp = dyn_cast_or_null<ROCDL::SetPrioOp>(op->getPrevNode());
   auto wmmaLayout = cast<AMDWmmaEncodingAttr>(
       cast<RankedTensorType>(op.getResult().getType()).getEncoding());
   int wmmaVer = wmmaLayout.getVersion();
@@ -341,6 +342,7 @@ LogicalResult convertDot(DotOp op, DotOpAdaptor adaptor,
 
   intrinsicName = addInstructionSuffix(intrinsicName, kWidth, aElemTy, bElemTy,
                                        dElemTy, tied);
+  Value firstWmma;
   for (int b = 0; b < numRepB; ++b) {
     for (int m = 0; m < numRepM / tiedGroup; ++m) {
       for (int n = 0; n < numRepN; ++n) {
@@ -374,6 +376,8 @@ LogicalResult convertDot(DotOp op, DotOpAdaptor adaptor,
                             hb[{b, n, k}], acc, aTensorTy.getElementType(),
                             bTensorTy.getElementType(), dstElemTy,
                             intrinsicName, optTied);
+            if (!firstWmma)
+              firstWmma = acc;
           }
         }
         for (unsigned v = 0; v < dElemsToStorePerThread; ++v) {
@@ -388,6 +392,9 @@ LogicalResult convertDot(DotOp op, DotOpAdaptor adaptor,
       }
     }
   }
+
+  if (setPrioOp && firstWmma)
+    setPrioOp->moveAfter(firstWmma.getDefiningOp());
 
   // replace with new packed result
   Type structTy = LLVM::LLVMStructType::getLiteral(

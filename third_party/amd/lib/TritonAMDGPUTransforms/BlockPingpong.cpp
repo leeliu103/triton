@@ -46,6 +46,7 @@ class Pingponger {
   SmallVector<tt::DotOp> dotOps;
   SmallVector<tt::DotScaledOp> scaledDotOps;
   SmallVector<ttg::Fp4ToFpOp> fp4TofpOps;
+  SmallVector<arith::MulFOp> mulfOps;
   SmallVector<SmallVector<Operation *>> subViewOps;
   SmallVector<SmallVector<Operation *>> loadSliceOps;
   SmallVector<Operation *> dotSliceOps;
@@ -414,27 +415,34 @@ void Pingponger::transformOnePPClusters(OpBuilder &builder, Location loc) {
   // prependClusterBarrier(builder, loc);
   // Add a remark for user feedback
 
+  if (sliceDot(builder, loc, dotOps[0], 2).failed())
+    return;
+
+  updateOpInsertion(gLoadOps[2]);
+  appendSlicedLoadAB(/*slice=*/0);
+  appendClusterBarrier(builder, loc);
+
   updateOpInsertion(fp4TofpOps[0]->getPrevNode());
-  appendClusterBarrier(builder, loc);
-
-  appendOpWithPrio(builder, fp4TofpOps[0], loc);
-  appendClusterBarrier(builder, loc);
-
-
-  updateOpInsertion(lStoreOps[1]);
-  appendClusterBarrier(builder, loc);
-
   appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
 
-  updateOpInsertion(lLoadOps[0]->getPrevNode());
-
+  updateOpInsertion(mulfOps[0]);
   appendOp(builder.create<ROCDL::SetPrioOp>(loc, lowPriority));
   appendClusterBarrier(builder, loc);
 
-  updateOpInsertion(dotOps[0]->getPrevNode());
+  appendOp(gLoadOps[0]);
+  appendSlicedLoadAB(/*slice=*/1);
   appendClusterBarrier(builder, loc);
 
-  appendOpWithPrio(builder, dotOps[0], loc);
+  //appendOp(dotSliceOps[0]);
+  appendOpWithPrio(builder, dotSliceOps[0], loc);
+  appendClusterBarrier(builder, loc);
+
+  moveOpAndPredecessorsUpSameBlock(lStoreOps[0]);
+  moveOpAndPredecessorsUpSameBlock(lStoreOps[1]);
+  appendClusterBarrier(builder, loc);
+
+  //appendOp(dotSliceOps[1]);
+  appendOpWithPrio(builder, dotSliceOps[1], loc);
 
   updateOpInsertion(lastInsertedOp->getBlock()->getTerminator());
   prependClusterBarrier(builder, loc);
@@ -535,6 +543,7 @@ LogicalResult Pingponger::sliceDot(OpBuilder &builder, Location loc,
   genOffsetConstants(loc, builder, numSlices, sliceWidth);
   builder.setInsertionPointAfter(gLoadOps[0]);
   auto dotEncoding = op.getType().getEncoding();
+
   if (genLocalSlice(builder, op.getA(), dotEncoding, 0, numSlices, sliceWidth)
           .failed() ||
       genLocalSlice(builder, op.getB(), dotEncoding, 1, numSlices, sliceWidth)
@@ -931,7 +940,9 @@ void Pingponger::getDotPingponged() {
         .Case<ttg::AsyncWaitOp>(
             [&](auto asyncOp) { asyncWaitOps.push_back(asyncOp); })
         .Case<ttg::Fp4ToFpOp>(
-            [&](auto fp4TofpOp) { fp4TofpOps.push_back(fp4TofpOp); });
+            [&](auto fp4TofpOp) { fp4TofpOps.push_back(fp4TofpOp); })
+        .Case<arith::MulFOp>(
+            [&](auto mulfOp) { mulfOps.push_back(mulfOp); });
   });
 
   // Currently, pingpong scheduling is known as helpful under limited condition.

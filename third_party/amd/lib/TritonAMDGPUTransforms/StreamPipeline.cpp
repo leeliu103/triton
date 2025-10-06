@@ -402,12 +402,12 @@ createStreamOps(const LoadToInfoMap &loadToInfo, scf::ForOp &forOp,
       auto sharedEncoding = getSharedEncIfAllUsersAreDotEnc(scaleOp->getResult(0)).value_or(nullptr);
       auto ty = cast<RankedTensorType>(scaleOp->getResultTypes()[0]);
       alloc = triton::createAlloc(forOp, ty, scaleOp->getLoc(),
-                                        sharedEncoding, numBuffers * 3);
+                                        sharedEncoding, numBuffers);
     } else{
       // Create an allocation that can hold distance number of loadOp shapes.
       auto ty = cast<RankedTensorType>(loadOp->getResultTypes()[0]);
       alloc = triton::createAlloc(forOp, ty, loadOp->getLoc(),
-                                        info.sharedEncoding, numBuffers * 3);
+                                        info.sharedEncoding, numBuffers);
     }
     assert(alloc && "Failed to create alloc for the async load.");
     auto arch = getAMDArch(loadOp->getParentOfType<ModuleOp>());
@@ -504,7 +504,7 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
   stages[SCHED_GLOBAL_LOAD] = 0;
   stages[SCHED_CONVERT] = 0;
   stages[SCHED_SCALE] = 0;
-  stages[SCHED_LOCAL_STORE] = 1;
+  stages[SCHED_LOCAL_STORE] = 0;
   stages[SCHED_LOCAL_LOAD] = 1;
   stages[SCHED_COMPUTE] = 1;
   stages[SCHED_ASYNC_WAIT] = stages[SCHED_LOCAL_LOAD];
@@ -580,10 +580,10 @@ LogicalResult initSchedule(int maxDist, Stages &stages, int numStages,
   }
 
   globalLoadCluster = 1;
-  localStoreCluster = 3;
-  computeCluster = 6;
-  localLoadCluster = 5;
-  int scaleCluster = 4;
+  localStoreCluster = 5;
+  computeCluster = 4;
+  localLoadCluster = 3;
+  int scaleCluster = 2;
   int convertCluster = 2;
 
   // Make assignments

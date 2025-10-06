@@ -1892,10 +1892,14 @@ template <typename OP>
 Value EmitDualBF16ElementwiseOp(Location loc,
                                 ConversionPatternRewriter &rewriter,
                                 MultipleOperandsRange operands) {
-  auto v0 = convertBf16ToFp32(loc, rewriter, operands[0][0]);
-  auto v1 = convertBf16ToFp32(loc, rewriter, operands[0][1]);
-  auto result = rewriter.create<OP>(loc, f32_ty, v0, v1);
-  return convertFp32ToBf16(loc, rewriter, result, RoundingMode::RTNE);
+  // auto v0 = convertBf16ToFp32(loc, rewriter, operands[0][0]);
+  // auto v1 = convertBf16ToFp32(loc, rewriter, operands[0][1]);
+  // auto result = rewriter.create<OP>(loc, f32_ty, v0, v1);
+  // return convertFp32ToBf16(loc, rewriter, result, RoundingMode::RTNE);
+  auto b = TritonLLVMOpBuilder(loc, rewriter);
+  Value aVal = packLLVector(loc, ValueRange{operands[0][0], b.bf16_val(0.0)}, rewriter);
+  Value bVal = packLLVector(loc, ValueRange{operands[0][1], b.bf16_val(0.0)}, rewriter);
+  return LLVM::createLLVMIntrinsicCallOp(rewriter, loc, "llvm.amdgcn.fdot2.bf16.bf16", bf16_ty, ValueRange{aVal, bVal, b.bf16_val(0.0)})->getResult(0);
 }
 
 struct FDivOpConversion

@@ -423,6 +423,22 @@ void Pingponger::transformOnePPClusters(OpBuilder &builder, Location loc) {
   appendClusterBarrier(builder, loc);
 
   updateOpInsertion(fp4TofpOps[0]->getPrevNode());
+
+  // auto asmStr = builder.getStringAttr("v_or_b32_e32 v0, 0, v0");
+  // auto cons   = builder.getStringAttr("");
+  // auto nop = builder.create<LLVM::InlineAsmOp>(
+  //       loc, TypeRange{},
+  //       /*operands=*/ValueRange{},
+  //       /*asm_string=*/asmStr,
+  //       /*constraints=*/cons,
+  //       /*has_side_effects=*/true,
+  //       /*is_align_stack=*/false, LLVM::TailCallKind::None,
+  //       /*asm_dialect=*/
+  //       LLVM::AsmDialectAttr::get(builder.getContext(),
+  //                                 LLVM::AsmDialect::AD_ATT),
+  //               /*operand_attrs=*/ArrayAttr());
+  // appendOp(nop);
+
   appendOp(builder.create<ROCDL::SetPrioOp>(loc, highPriority));
 
   updateOpInsertion(mulfOps[0]);

@@ -120,6 +120,12 @@ chooseDsReadTrLayout(Attribute enc, ArrayRef<int64_t> shape,
                      int32_t elemBitWidth, unsigned instBitWidth,
                      unsigned numLanesInShuffleGroup);
 
+// The primary goal of this function is to efficiently load 2D tiles of a
+// tensor from global memory using the `global_load_tr` instruction for AMD
+// GPUs. Returns a pair of address and data layout.
+std::pair<LinearLayout, LinearLayout>
+chooseGlobalLoadTrLayout(Attribute enc, ArrayRef<int64_t> shape);
+
 // Create LinearLayout for scale in scaled mfma.
 LinearLayout chooseScaledMfmaScaleLayout(MLIRContext *ctx, int dotOperandIdx,
                                          ArrayRef<int64_t> dotOperandShape,

@@ -898,6 +898,11 @@ void init_gluon_ir(py::module &&m) {
                                                     Value() /*stride*/, cache,
                                                     mask, other);
            })
+      .def("create_global_load_transpose",
+           [](GluonOpBuilder &self, Type resultType,
+              Value ptr) -> Value {
+             return self.create<ttag::GlobalLoadTransposeOp>(resultType, ptr);
+           })
       .def("create_buffer_store",
            [](GluonOpBuilder &self, Value storedValue, Value ptr, Value offsets,
               Value mask, tt::CacheModifier cache) {
@@ -1030,6 +1035,37 @@ void init_gluon_ir(py::module &&m) {
 
         auto attr = ttg::LinearEncodingAttr::get(ctx, std::move(*layout));
         return layoutToGluon(attr);
+      });
+
+  m.def(
+      "get_global_load_tr_layouts",
+      [](py::object layoutObj, std::vector<int64_t> shape) -> py::tuple {
+        DialectRegistry registry;
+        registry.insert<triton::TritonDialect, ttg::TritonGPUDialect,
+                        gluon::GluonDialect>();
+        MLIRContext context(MLIRContext::Threading::DISABLED);
+        context.appendDialectRegistry(registry);
+        context.loadAllAvailableDialects();
+
+        GluonOpBuilder builder(&context);
+        auto builderObj =
+            py::cast(&builder, py::return_value_policy::reference);
+
+        auto layoutAttr =
+            layoutObj.attr("_to_ir")(builderObj).cast<Attribute>();
+        if (!isa<ttg::BlockedEncodingAttr>(layoutAttr))
+          throw std::invalid_argument(
+              "global_load_transpose layout must be a BlockedLayout");
+        if (shape.size() != 2)
+          throw std::invalid_argument(
+              "global_load_transpose requires a 2D shape");
+        auto layouts = ttg::chooseGlobalLoadTrLayout(layoutAttr, shape);
+        auto addrAttr =
+            ttg::LinearEncodingAttr::get(&context, std::move(layouts.first));
+        auto dataAttr =
+            ttg::LinearEncodingAttr::get(&context, std::move(layouts.second));
+        return py::make_tuple(layoutToGluon(addrAttr),
+                              layoutToGluon(dataAttr));
       });
 
   m.def(

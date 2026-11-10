@@ -1,0 +1,78 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "dtype": "FP16 inputs/output; FP32 accumulation",
+  "seed": 20261113,
+  "pattern": "normal",
+  "torch": "2.12.0+rocm10.0.0",
+  "dense_flops": 1099511627776,
+  "launch_method": "HIP module launch of hash-checked archived code objects",
+  "hsaco_sha256": {
+    "tutorial_baseline": "a7b4bbe0a9954b22b5bdac91a85f26499f41df102c3da64f3a3451501c47ec1c",
+    "previous_best_asm": "ac241678c55246a174add15facd621680dbb52a18ec6b8b8f95ea485e41a59ad",
+    "a_direct_gluon": "d50d8d83b7e7425aca966e86d595129b988ac09d103ea6a8462a1c0add226851",
+    "optimized_asm": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0"
+  },
+  "validation": {
+    "tutorial_baseline": {
+      "finite": true,
+      "max_abs_error": 0.130462646484375,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "passed": true
+    },
+    "previous_best_asm": {
+      "finite": true,
+      "max_abs_error": 0.130462646484375,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "a_direct_gluon": {
+      "finite": true,
+      "max_abs_error": 0.130462646484375,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "optimized_asm": {
+      "finite": true,
+      "max_abs_error": 0.130462646484375,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    }
+  },
+  "source_validation": {
+    "changed_elements_vs_archived_gluon": 0,
+    "inputs_unchanged": true,
+    "guards_intact": true,
+    "hsaco_sha256": "420ab165da0c932af94c8620010d82ea4d4a47d1fc6edcbb52d7e4fc38c304c8",
+    "amdgcn_sha256": "9ad95473a3b93f6b544cf90f769859d05ba1845dfbd1f8f3b880e62873590bf9",
+    "note": "Recompiled source is checked separately; archived code objects own the timing comparison.",
+    "passed": true
+  },
+  "repeats": 3,
+  "launches_per_sample": 3,
+  "fresh_triton_cache": true,
+  "performance_mode": "auto",
+  "original_result_sha256": "941bf39155193e030c80b9579c892ad7f943448eb3bcdc2ffc9ad68d3ac57543",
+  "purpose": "Package portability and correctness check; historical 31-round timings remain authoritative."
+}

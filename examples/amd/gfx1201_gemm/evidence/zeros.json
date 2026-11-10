@@ -1,0 +1,132 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "seed": 20261114,
+  "pattern": "zeros",
+  "dtype": "FP16 A/B/C, FP32 accumulation",
+  "dense_flops": 1099511627776,
+  "torch": "2.12.0+rocm10.0.0",
+  "triton": "3.8.0",
+  "performance_mode": "auto",
+  "config": {
+    "BLOCK_SIZE_M": 256,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 4,
+    "num_warps": 8,
+    "num_stages": 1,
+    "pipeline": "direct",
+    "b_order": "kn",
+    "split_n": false,
+    "direct_operands": "A"
+  },
+  "grid": [
+    2048,
+    1,
+    1
+  ],
+  "validation": {
+    "generated": {
+      "finite": true,
+      "max_abs_error": 0.0,
+      "rmse": 0.0,
+      "reference_rms": 0.0,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "selected": {
+      "finite": true,
+      "max_abs_error": 0.0,
+      "rmse": 0.0,
+      "reference_rms": 0.0,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true,
+      "bitwise_equal_to_standard": true
+    },
+    "tutorial": {
+      "finite": true,
+      "max_abs_error": 0.0,
+      "rmse": 0.0,
+      "reference_rms": 0.0,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    }
+  },
+  "median_ms": {
+    "tutorial": 7.988797505696614,
+    "phase1": 7.612603505452474,
+    "candidate": 7.449706395467122,
+    "generated": 7.499107996622722
+  },
+  "paired_speedup": {
+    "tutorial": 1.0723640747181002,
+    "phase1": 1.0218662456394885,
+    "generated": 1.0044147123356308
+  },
+  "candidate_tflops": 147.59126996535235,
+  "pairs": [
+    {
+      "round": 0,
+      "order": [
+        "tutorial",
+        "phase1",
+        "candidate",
+        "generated"
+      ],
+      "tutorial": 8.120786666870117,
+      "phase1": 7.392545064290364,
+      "candidate": 7.361265182495117,
+      "generated": 7.2848765055338545,
+      "vs_tutorial": 1.1031781175579873,
+      "vs_phase1": 1.0042492534937648,
+      "vs_generated": 0.9896228874972589
+    },
+    {
+      "round": 1,
+      "order": [
+        "phase1",
+        "candidate",
+        "generated",
+        "tutorial"
+      ],
+      "phase1": 7.612603505452474,
+      "candidate": 7.449706395467122,
+      "generated": 7.547735214233398,
+      "tutorial": 7.988797505696614,
+      "vs_tutorial": 1.0723640747181002,
+      "vs_phase1": 1.0218662456394885,
+      "vs_generated": 1.0131587492932503
+    },
+    {
+      "round": 2,
+      "order": [
+        "candidate",
+        "generated",
+        "tutorial",
+        "phase1"
+      ],
+      "candidate": 7.466147104899089,
+      "generated": 7.499107996622722,
+      "tutorial": 7.96342404683431,
+      "phase1": 7.702032089233398,
+      "vs_tutorial": 1.0666042250371575,
+      "vs_phase1": 1.0315939374111083,
+      "vs_generated": 1.0044147123356308
+    }
+  ],
+  "original_result_sha256": "5eb2c6c8513e18b14d8ded2f7c72e5308a7c81be371750c9a06355c1c1a63eb0"
+}

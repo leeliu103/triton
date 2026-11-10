@@ -1,0 +1,132 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "seed": 20261114,
+  "pattern": "uniform",
+  "dtype": "FP16 A/B/C, FP32 accumulation",
+  "dense_flops": 1099511627776,
+  "torch": "2.12.0+rocm10.0.0",
+  "triton": "3.8.0",
+  "performance_mode": "auto",
+  "config": {
+    "BLOCK_SIZE_M": 256,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 4,
+    "num_warps": 8,
+    "num_stages": 1,
+    "pipeline": "direct",
+    "b_order": "kn",
+    "split_n": false,
+    "direct_operands": "A"
+  },
+  "grid": [
+    2048,
+    1,
+    1
+  ],
+  "validation": {
+    "generated": {
+      "finite": true,
+      "max_abs_error": 0.0631103515625,
+      "rmse": 0.006260812282562256,
+      "reference_rms": 30.16444206237793,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "selected": {
+      "finite": true,
+      "max_abs_error": 0.0631103515625,
+      "rmse": 0.006260812282562256,
+      "reference_rms": 30.16444206237793,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true,
+      "bitwise_equal_to_standard": true
+    },
+    "tutorial": {
+      "finite": true,
+      "max_abs_error": 0.0631103515625,
+      "rmse": 0.006260812282562256,
+      "reference_rms": 30.16444206237793,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    }
+  },
+  "median_ms": {
+    "tutorial": 9.641976674397787,
+    "phase1": 9.107152938842773,
+    "candidate": 8.32281748453776,
+    "generated": 8.443126678466797
+  },
+  "paired_speedup": {
+    "tutorial": 1.159178823424381,
+    "phase1": 1.0942391751065264,
+    "generated": 1.0144189582437768
+  },
+  "candidate_tflops": 132.10810279315714,
+  "pairs": [
+    {
+      "round": 0,
+      "order": [
+        "tutorial",
+        "phase1",
+        "candidate",
+        "generated"
+      ],
+      "tutorial": 9.288663228352865,
+      "phase1": 8.598729451497396,
+      "candidate": 8.436179478963217,
+      "generated": 8.44558016459147,
+      "vs_tutorial": 1.101050926134921,
+      "vs_phase1": 1.0192681975222933,
+      "vs_generated": 1.0011143297332277
+    },
+    {
+      "round": 1,
+      "order": [
+        "phase1",
+        "candidate",
+        "generated",
+        "tutorial"
+      ],
+      "phase1": 9.107152938842773,
+      "candidate": 8.32281748453776,
+      "generated": 8.443126678466797,
+      "tutorial": 9.67108408610026,
+      "vs_tutorial": 1.1619964157651332,
+      "vs_phase1": 1.0942391751065264,
+      "vs_generated": 1.0144553444975273
+    },
+    {
+      "round": 2,
+      "order": [
+        "candidate",
+        "generated",
+        "tutorial",
+        "phase1"
+      ],
+      "candidate": 8.317937215169271,
+      "generated": 8.437873204549154,
+      "tutorial": 9.641976674397787,
+      "phase1": 9.147820154825846,
+      "vs_tutorial": 1.159178823424381,
+      "vs_phase1": 1.099770281764466,
+      "vs_generated": 1.0144189582437768
+    }
+  ],
+  "original_result_sha256": "202fe6a109307b2675ae6f1a8947b0d02ca335d22334d7c8a935b715f5636eae"
+}

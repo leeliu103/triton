@@ -1,0 +1,217 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "device": "Radeon AI PRO R9700 gfx1201",
+  "sqtt_scope": "Selected-SIMD modeled interval union, not a physical busy mask; warmed AUTO capture.",
+  "sqtt": {
+    "tutorial_baseline": {
+      "hsaco_sha256": "a7b4bbe0a9954b22b5bdac91a85f26499f41df102c3da64f3a3451501c47ec1c",
+      "shader_envelope_cycles": 23243445,
+      "combined_valu_percent": 77.10160004250662,
+      "wmma_percent": 72.18041903857196,
+      "other_valu_percent": 4.921181003934658,
+      "detailed_waves": 128
+    },
+    "previous_best_asm": {
+      "hsaco_sha256": "ac241678c55246a174add15facd621680dbb52a18ec6b8b8f95ea485e41a59ad",
+      "shader_envelope_cycles": 21292875,
+      "combined_valu_percent": 85.08069013695895,
+      "wmma_percent": 78.79262898974422,
+      "other_valu_percent": 6.288061147214737,
+      "detailed_waves": 128
+    },
+    "a_direct_gluon": {
+      "hsaco_sha256": "d50d8d83b7e7425aca966e86d595129b988ac09d103ea6a8462a1c0add226851",
+      "shader_envelope_cycles": 19329568,
+      "combined_valu_percent": 89.77884037553245,
+      "wmma_percent": 86.79560764110197,
+      "other_valu_percent": 2.983232734430485,
+      "strict_validation": {
+        "packets": 12048269,
+        "waves": 4096,
+        "detailed_waves": 128,
+        "known_instruction_pcs": 3192448,
+        "unknown_instruction_pcs": 0,
+        "packet_loss_markers": 0,
+        "context_save_markers": 0,
+        "context_restore_wave_starts": 0,
+        "incomplete_waves": [],
+        "passed": true
+      }
+    },
+    "optimized_asm": {
+      "hsaco_sha256": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0",
+      "shader_envelope_cycles": 18801031,
+      "combined_valu_percent": 92.30273595102311,
+      "wmma_percent": 89.23561691909343,
+      "other_valu_percent": 3.067119031929685,
+      "strict_validation": {
+        "packets": 12152549,
+        "waves": 4096,
+        "detailed_waves": 128,
+        "known_instruction_pcs": 3258112,
+        "unknown_instruction_pcs": 0,
+        "packet_loss_markers": 0,
+        "context_save_markers": 0,
+        "context_restore_wave_starts": 0,
+        "incomplete_waves": [],
+        "passed": true
+      }
+    }
+  },
+  "counter_and_clock_crosscheck": {
+    "a_direct_gluon": {
+      "production_hsaco_sha256": "d50d8d83b7e7425aca966e86d595129b988ac09d103ea6a8462a1c0add226851",
+      "event99_measured_service_cycles": 2221309952.0,
+      "scalar_TRANS_one_cycle_contributions_removed": 16384.0,
+      "main_combined_service_cycles": 2221293568.0,
+      "direct_timed_pairs": 15,
+      "raw_wave_records_validated": 245760,
+      "summary": {
+        "shader_ghz": {
+          "count": 15,
+          "min": 2.270211794961905,
+          "median": 2.3279223294819538,
+          "max": 2.5174196911222055
+        },
+        "main_combined_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.8539730137017539,
+          "median": 0.8987456803923723,
+          "max": 0.9028432684245782
+        },
+        "main_combined_fraction_same_simd_envelopes": {
+          "count": 15,
+          "min": 0.8603494386001284,
+          "median": 0.8996859610186221,
+          "max": 0.9036341140974361
+        },
+        "all_VALU_service_sum_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.8539793125062245,
+          "median": 0.8987523094347645,
+          "max": 0.9028499276902975
+        },
+        "conditional_production_main_fraction_paired_diagnostic_clock": {
+          "count": 15,
+          "min": 0.8327251049322496,
+          "median": 0.869530585748411,
+          "max": 0.899437020837127
+        },
+        "matrix_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.8255968995619928,
+          "median": 0.8688818444160074,
+          "max": 0.8728432763591635
+        },
+        "production_ms": {
+          "count": 15,
+          "min": 8.041569709777832,
+          "median": 8.550978660583496,
+          "max": 8.68589973449707
+        },
+        "diagnostic_ms": {
+          "count": 15,
+          "min": 8.122932434082031,
+          "median": 8.433695793151855,
+          "max": 8.754502296447754
+        }
+      },
+      "limits": [
+        "Direct fractions use the instrumented global shader interval or same-SIMD envelopes, as explicitly named.",
+        "The production estimate uses an adjacent diagnostic clock, not a directly sampled production clock.",
+        "Counter event99 measures summed service work, not a hardware exclusive busy mask; main-only subtraction here allows only previously calibrated one-cycle scalar reciprocal opcodes.",
+        "Controlled capture timing is not transferred to AUTO. Only exact code object and validated work are transferred.",
+        "Few-pair smoke results establish instrumentation behavior and a preliminary estimate, not a stable performance comparison."
+      ]
+    },
+    "optimized_asm": {
+      "production_hsaco_sha256": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0",
+      "event99_measured_service_cycles": 2221309952.0,
+      "scalar_TRANS_one_cycle_contributions_removed": 16384.0,
+      "main_combined_service_cycles": 2221293568.0,
+      "direct_timed_pairs": 15,
+      "raw_wave_records_validated": 245760,
+      "summary": {
+        "shader_ghz": {
+          "count": 15,
+          "min": 2.24936589565535,
+          "median": 2.2882200083841844,
+          "max": 2.482222360243894
+        },
+        "main_combined_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.8757287187088086,
+          "median": 0.9246064718775225,
+          "max": 0.9276703898977327
+        },
+        "main_combined_fraction_same_simd_envelopes": {
+          "count": 15,
+          "min": 0.8816756957457498,
+          "median": 0.9251752806038865,
+          "max": 0.9282567029923823
+        },
+        "all_VALU_service_sum_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.8757351779807996,
+          "median": 0.9246132916660699,
+          "max": 0.9276772322853788
+        },
+        "conditional_production_main_fraction_paired_diagnostic_clock": {
+          "count": 15,
+          "min": 0.8490932561008744,
+          "median": 0.8893375433253851,
+          "max": 0.9304870394792119
+        },
+        "matrix_fraction_global_diagnostic_interval": {
+          "count": 15,
+          "min": 0.846629698389852,
+          "median": 0.8938833244719284,
+          "max": 0.8968454335519713
+        },
+        "production_ms": {
+          "count": 15,
+          "min": 7.911005973815918,
+          "median": 8.442374229431152,
+          "max": 8.78302001953125
+        },
+        "diagnostic_ms": {
+          "count": 15,
+          "min": 7.936046123504639,
+          "median": 8.40893268585205,
+          "max": 8.69993782043457
+        }
+      },
+      "limits": [
+        "Direct fractions use the instrumented global shader interval or same-SIMD envelopes, as explicitly named.",
+        "The production estimate uses an adjacent diagnostic clock, not a directly sampled production clock.",
+        "Counter event99 measures summed service work, not a hardware exclusive busy mask; main-only subtraction here allows only previously calibrated one-cycle scalar reciprocal opcodes.",
+        "Controlled capture timing is not transferred to AUTO. Only exact code object and validated work are transferred.",
+        "Few-pair smoke results establish instrumentation behavior and a preliminary estimate, not a stable performance comparison."
+      ]
+    }
+  },
+  "controlled_compute": {
+    "phase1_lds_bank_conflict_over_indexed_active_percent": 8.3333,
+    "optimized_lds_bank_conflict_over_indexed_active_percent": 0,
+    "optimized_passes": 5,
+    "optimized_dispatches": 30,
+    "limit": "profile_standard scheduling differs from AUTO; no AUTO stall percentages are inferred."
+  },
+  "controlled_traffic": {
+    "cooperative_A_full_gemm_TCP_REQ": 109051904,
+    "direct_A_full_gemm_TCP_REQ": 310378496,
+    "A_line_touch_ratio": 4,
+    "whole_gemm_TCP_request_ratio": 2.8461538461538463,
+    "matched_cooperative_GL2_EA_requested_GiB": 7.8397,
+    "direct_GL2_EA_requested_GiB": 7.9566,
+    "limit": "Controlled interface requests, not AUTO bandwidth or physical DRAM bytes; external requested-byte ranges overlap."
+  },
+  "source_summary_sha256": {
+    "summary.json": "60bdbcf95619639861ae542f704f252936fd34cb6cb94e316d86273bd8942214",
+    "phase2-summary.json": "af5eaeb0a40edfa7272fd4f8205e877facb4b5258762d9c709736f76619e980b"
+  }
+}

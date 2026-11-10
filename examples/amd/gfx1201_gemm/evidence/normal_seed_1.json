@@ -1,0 +1,324 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "seed": 20261112,
+  "pattern": "normal",
+  "dtype": "FP16 A/B/C, FP32 accumulation",
+  "dense_flops": 1099511627776,
+  "torch": "2.12.0+rocm10.0.0",
+  "triton": "3.8.0",
+  "performance_mode": "auto",
+  "config": {
+    "BLOCK_SIZE_M": 256,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 4,
+    "num_warps": 8,
+    "num_stages": 1,
+    "pipeline": "direct",
+    "b_order": "kn",
+    "split_n": false,
+    "direct_operands": "A"
+  },
+  "grid": [
+    2048,
+    1,
+    1
+  ],
+  "validation": {
+    "generated": {
+      "finite": true,
+      "max_abs_error": 0.19476318359375,
+      "rmse": 0.018755093216896057,
+      "reference_rms": 90.50226593017578,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "selected": {
+      "finite": true,
+      "max_abs_error": 0.19476318359375,
+      "rmse": 0.018755093216896057,
+      "reference_rms": 90.50226593017578,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true,
+      "bitwise_equal_to_standard": true
+    },
+    "tutorial": {
+      "finite": true,
+      "max_abs_error": 0.19476318359375,
+      "rmse": 0.018755093216896057,
+      "reference_rms": 90.50226593017578,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    }
+  },
+  "median_ms": {
+    "tutorial": 9.848146711077009,
+    "phase1": 9.283695765904017,
+    "candidate": 8.521421704973493,
+    "generated": 8.657420022147042
+  },
+  "paired_speedup": {
+    "tutorial": 1.155088738576583,
+    "phase1": 1.0910817882853316,
+    "generated": 1.013921586474347
+  },
+  "candidate_tflops": 129.02912986154348,
+  "pairs": [
+    {
+      "round": 0,
+      "order": [
+        "tutorial",
+        "phase1",
+        "candidate",
+        "generated"
+      ],
+      "tutorial": 9.515359061104911,
+      "phase1": 8.927215031215123,
+      "candidate": 8.489425659179688,
+      "generated": 8.582049778529576,
+      "vs_tutorial": 1.120848387525,
+      "vs_phase1": 1.0515687856412348,
+      "vs_generated": 1.0109105283523785
+    },
+    {
+      "round": 1,
+      "order": [
+        "phase1",
+        "candidate",
+        "generated",
+        "tutorial"
+      ],
+      "phase1": 9.222396850585938,
+      "candidate": 8.566363743373326,
+      "generated": 8.570020948137556,
+      "tutorial": 9.828555515834264,
+      "vs_tutorial": 1.1473427711305546,
+      "vs_phase1": 1.0765824481501964,
+      "vs_generated": 1.0004269261583782
+    },
+    {
+      "round": 2,
+      "order": [
+        "candidate",
+        "generated",
+        "tutorial",
+        "phase1"
+      ],
+      "candidate": 8.498865944998604,
+      "generated": 8.62361090523856,
+      "tutorial": 9.80752672467913,
+      "phase1": 9.283695765904017,
+      "vs_tutorial": 1.1539806355518107,
+      "vs_phase1": 1.0923452406455791,
+      "vs_generated": 1.014677835966264
+    },
+    {
+      "round": 3,
+      "order": [
+        "generated",
+        "tutorial",
+        "phase1",
+        "candidate"
+      ],
+      "generated": 8.600599561418806,
+      "tutorial": 9.81284659249442,
+      "phase1": 9.272953578404017,
+      "candidate": 8.479603358677455,
+      "vs_tutorial": 1.1572294336683346,
+      "vs_phase1": 1.0935598265825373,
+      "vs_generated": 1.0142690875531968
+    },
+    {
+      "round": 4,
+      "order": [
+        "generated",
+        "candidate",
+        "phase1",
+        "tutorial"
+      ],
+      "generated": 8.59963389805385,
+      "candidate": 8.484066009521484,
+      "phase1": 9.304731096540179,
+      "tutorial": 9.807213919503349,
+      "vs_tutorial": 1.1559568146330927,
+      "vs_phase1": 1.0967301628838908,
+      "vs_generated": 1.013621757351094
+    },
+    {
+      "round": 5,
+      "order": [
+        "tutorial",
+        "generated",
+        "candidate",
+        "phase1"
+      ],
+      "tutorial": 9.857493809291295,
+      "generated": 8.678075517926898,
+      "candidate": 8.521421704973493,
+      "phase1": 9.279045104980469,
+      "vs_tutorial": 1.1567898116740318,
+      "vs_phase1": 1.08890809846493,
+      "vs_generated": 1.0183835301639836
+    },
+    {
+      "round": 6,
+      "order": [
+        "phase1",
+        "tutorial",
+        "generated",
+        "candidate"
+      ],
+      "phase1": 9.281913757324219,
+      "tutorial": 9.818756103515625,
+      "generated": 8.664652688162667,
+      "candidate": 8.505301884242467,
+      "vs_tutorial": 1.154427701350208,
+      "vs_phase1": 1.0913091485348168,
+      "vs_generated": 1.0187354671343793
+    },
+    {
+      "round": 7,
+      "order": [
+        "candidate",
+        "phase1",
+        "tutorial",
+        "generated"
+      ],
+      "candidate": 8.52587890625,
+      "phase1": 9.242393493652344,
+      "tutorial": 9.848146711077009,
+      "generated": 8.64457266671317,
+      "vs_tutorial": 1.155088738576583,
+      "vs_phase1": 1.084039967642174,
+      "vs_generated": 1.013921586474347
+    },
+    {
+      "round": 8,
+      "order": [
+        "tutorial",
+        "phase1",
+        "candidate",
+        "generated"
+      ],
+      "tutorial": 9.835466657366071,
+      "phase1": 9.266274588448661,
+      "candidate": 8.493792942592076,
+      "generated": 8.661721910749163,
+      "vs_tutorial": 1.157959314977668,
+      "vs_phase1": 1.0909466066664966,
+      "vs_generated": 1.0197707866546886
+    },
+    {
+      "round": 9,
+      "order": [
+        "phase1",
+        "candidate",
+        "generated",
+        "tutorial"
+      ],
+      "phase1": 9.316338675362724,
+      "candidate": 8.522250584193639,
+      "generated": 8.63337871006557,
+      "tutorial": 9.848199026925224,
+      "vs_tutorial": 1.155586652801649,
+      "vs_phase1": 1.0931782142902362,
+      "vs_generated": 1.0130397627685392
+    },
+    {
+      "round": 10,
+      "order": [
+        "candidate",
+        "generated",
+        "tutorial",
+        "phase1"
+      ],
+      "candidate": 8.544679914202009,
+      "generated": 8.662511008126396,
+      "tutorial": 9.85238756452288,
+      "phase1": 9.322944641113281,
+      "vs_tutorial": 1.1530434917927523,
+      "vs_phase1": 1.0910817882853316,
+      "vs_generated": 1.0137899950738403
+    },
+    {
+      "round": 11,
+      "order": [
+        "generated",
+        "tutorial",
+        "phase1",
+        "candidate"
+      ],
+      "generated": 8.694842747279576,
+      "tutorial": 9.869204929896764,
+      "phase1": 9.347328186035156,
+      "candidate": 8.516874040876116,
+      "vs_tutorial": 1.1587825395245055,
+      "vs_phase1": 1.097506918756029,
+      "vs_generated": 1.0208960124981667
+    },
+    {
+      "round": 12,
+      "order": [
+        "generated",
+        "candidate",
+        "phase1",
+        "tutorial"
+      ],
+      "generated": 8.672419956752233,
+      "candidate": 8.57873262677874,
+      "phase1": 9.296058654785156,
+      "tutorial": 9.880599975585938,
+      "vs_tutorial": 1.1517552073768316,
+      "vs_phase1": 1.0836167834124197,
+      "vs_generated": 1.0109208823784817
+    },
+    {
+      "round": 13,
+      "order": [
+        "tutorial",
+        "generated",
+        "candidate",
+        "phase1"
+      ],
+      "tutorial": 9.917675563267299,
+      "generated": 8.657420022147042,
+      "candidate": 8.536355154854911,
+      "phase1": 9.315842764718193,
+      "vs_tutorial": 1.161816183061079,
+      "vs_phase1": 1.0913138682403531,
+      "vs_generated": 1.0141822669155556
+    },
+    {
+      "round": 14,
+      "order": [
+        "phase1",
+        "tutorial",
+        "generated",
+        "candidate"
+      ],
+      "phase1": 9.353477478027344,
+      "tutorial": 9.869713919503349,
+      "generated": 8.68244389125279,
+      "candidate": 8.593333653041295,
+      "vs_tutorial": 1.1485314451872035,
+      "vs_phase1": 1.088457385186833,
+      "vs_generated": 1.010369693742772
+    }
+  ],
+  "original_result_sha256": "7c5ecfda24f4df12b3d981bf30fe44e5aeae26d6e216139978609d6295cf2dd5"
+}

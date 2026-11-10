@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "description": "Exact archived8192x8192x8192 FP16 GEMM code objects; FP32 accumulation; gfx1201 only.",
+  "benchmark_order": [
+    "tutorial_baseline",
+    "previous_best_asm",
+    "a_direct_gluon",
+    "optimized_asm"
+  ],
+  "kernels": {
+    "tutorial_baseline": {
+      "symbol": "matmul_kernel",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 49152,
+      "kernarg_bytes": 64,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "m",
+          "type": "i32",
+          "value": 8192,
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": "n",
+          "type": "i32",
+          "value": 8192,
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": "k",
+          "type": "i32",
+          "value": 8192,
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": "stride_am",
+          "type": "i32",
+          "value": 8192,
+          "offset": 36,
+          "size": 4
+        },
+        {
+          "name": "stride_bk",
+          "type": "i32",
+          "value": 8192,
+          "offset": 40,
+          "size": 4
+        },
+        {
+          "name": "stride_cm",
+          "type": "i32",
+          "value": 8192,
+          "offset": 44,
+          "size": 4
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 48,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 56,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 240,
+        ".sgpr_count": 36,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/tutorial_baseline/kernel.amdgcn",
+          "sha256": "a2e6edba630999fa4cf3f21e27082a428f2db5fa26bf5c440782b53c6e62fc70"
+        },
+        "hsaco": {
+          "path": "kernels/tutorial_baseline/kernel.hsaco",
+          "sha256": "a7b4bbe0a9954b22b5bdac91a85f26499f41df102c3da64f3a3451501c47ec1c"
+        }
+      }
+    },
+    "previous_best_asm": {
+      "symbol": "matmul_kernel",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 49152,
+      "kernarg_bytes": 64,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "m",
+          "type": "i32",
+          "value": 8192,
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": "n",
+          "type": "i32",
+          "value": 8192,
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": "k",
+          "type": "i32",
+          "value": 8192,
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": "stride_am",
+          "type": "i32",
+          "value": 8192,
+          "offset": 36,
+          "size": 4
+        },
+        {
+          "name": "stride_bk",
+          "type": "i32",
+          "value": 8192,
+          "offset": 40,
+          "size": 4
+        },
+        {
+          "name": "stride_cm",
+          "type": "i32",
+          "value": 8192,
+          "offset": 44,
+          "size": 4
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 48,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 56,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 256,
+        ".sgpr_count": 36,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/previous_best_asm/kernel.amdgcn",
+          "sha256": "ff17bcd9449da6990fbb7d18ad376113630c548f448a15d8291bb7bad12e240b"
+        },
+        "hsaco": {
+          "path": "kernels/previous_best_asm/kernel.hsaco",
+          "sha256": "ac241678c55246a174add15facd621680dbb52a18ec6b8b8f95ea485e41a59ad"
+        }
+      }
+    },
+    "a_direct_gluon": {
+      "symbol": "gemm",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 16384,
+      "kernarg_bytes": 40,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 24,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 32,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 214,
+        ".sgpr_count": 21,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/a_direct_gluon/kernel.amdgcn",
+          "sha256": "92dbde5471224cb6348c3733a788d5f25efcd9d6de907d1f4a92d3348e9ef617"
+        },
+        "hsaco": {
+          "path": "kernels/a_direct_gluon/kernel.hsaco",
+          "sha256": "d50d8d83b7e7425aca966e86d595129b988ac09d103ea6a8462a1c0add226851"
+        }
+      }
+    },
+    "optimized_asm": {
+      "symbol": "gemm",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 16384,
+      "kernarg_bytes": 40,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 24,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 32,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 215,
+        ".sgpr_count": 21,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/optimized_asm/kernel.amdgcn",
+          "sha256": "a1d1be947cc464a9a5c052bd4ececc2e598e87ba393332d0516473d57dd4abcb"
+        },
+        "hsaco": {
+          "path": "kernels/optimized_asm/kernel.hsaco",
+          "sha256": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0"
+        }
+      }
+    }
+  }
+}

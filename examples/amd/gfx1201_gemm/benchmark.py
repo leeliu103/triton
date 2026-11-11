@@ -1,4 +1,4 @@
-"""Validate and compare the four archived gfx1201 GEMM code objects."""
+"""Validate and compare the archived gfx1201 GEMM code objects listed in manifest.json."""
 
 import argparse
 import hashlib
@@ -166,6 +166,9 @@ def main():
                                                                            for row in pairs) for name in names},
                           optimized_paired_speedup={name: statistics.median(row[name] / row["optimized_asm"]
                                                                            for row in pairs) for name in names})
+            if "eight_chunk_asm" in names:
+                result["paired_speedup_vs_eight_chunk_asm"] = {
+                    name: statistics.median(row["eight_chunk_asm"] / row[name] for row in pairs) for name in names}
         (args.out / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         print(json.dumps({key: value for key, value in result.items() if key != "pairs"}, indent=2))
     finally:

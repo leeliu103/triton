@@ -1,0 +1,799 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "seed": 20261305,
+  "pattern": "normal",
+  "timing_backend": "host_launch_batch",
+  "launches_per_sample": 7,
+  "performance_mode": "auto",
+  "torch": "2.12.0+rocm10.0.0",
+  "triton": "3.8.0",
+  "device": "_CudaDeviceProperties(name='AMD Radeon AI PRO R9700', major=12, minor=0, gcnArchName='gfx1201', total_memory=32624MB, multi_processor_count=32, pci_bus_id=3, pci_device_id=0, pci_domain_id=0, L2_cache_size=8MB)",
+  "standard_validation": {
+    "finite": true,
+    "max_abs_error": 0.130126953125,
+    "rmse": 0.018760165199637413,
+    "reference_rms": 90.51236724853516,
+    "outside_tolerance": 0,
+    "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+    "passed": true
+  },
+  "entries": [
+    {
+      "module": "gluon.direct_load",
+      "config": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/config.json",
+      "name": "current_best",
+      "variant": "/app/att/triton-gemm-asm/pingpong2/asm/chunk-sizes/clusters8_control_lds16/kernel.amdgcn"
+    },
+    {
+      "name": "consumer_lds",
+      "module": "gluon.direct_load",
+      "config": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/config.json",
+      "variant": "/app/att/triton-gemm-asm/saturation/asm/ready-waits/consumer_lds/kernel.amdgcn"
+    },
+    {
+      "name": "consumer_lds_B_after0",
+      "module": "gluon.direct_load",
+      "config": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/config.json",
+      "variant": "/app/att/triton-gemm-asm/saturation/asm/early-b/consumer_lds_B_after0/kernel.amdgcn"
+    },
+    {
+      "name": "earlyB_double_LDS_bank",
+      "module": "gluon.direct_load",
+      "config": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/config.json",
+      "variant": "/app/att/triton-gemm-asm/saturation/asm/double-lds-bank/earlyB_double_LDS_bank/kernel.amdgcn"
+    },
+    {
+      "name": "tutorial_control",
+      "module": "tutorial",
+      "config": "/app/att/triton-gemm-asm/results/tune8192/config.json"
+    }
+  ],
+  "candidates": {
+    "current_best": {
+      "config": {
+        "BLOCK_SIZE_M": 256,
+        "BLOCK_SIZE_N": 128,
+        "BLOCK_SIZE_K": 64,
+        "GROUP_SIZE_M": 4,
+        "num_warps": 8,
+        "num_stages": 1,
+        "pipeline": "direct",
+        "b_order": "kn",
+        "split_n": false,
+        "direct_operands": "A"
+      },
+      "kernel_grid": [
+        2048,
+        1,
+        1
+      ],
+      "hsaco_sha256": "7e5e7a726987ffd777be2aa70adec4c6401116dc1d3f73810cfdf0e798670a34",
+      "shared_bytes": 16384,
+      "resources": {
+        "n_regs": 215,
+        "n_spills": 0
+      },
+      "validation": {
+        "finite": true,
+        "max_abs_error": 0.130126953125,
+        "rmse": 0.018760165199637413,
+        "reference_rms": 90.51236724853516,
+        "outside_tolerance": 0,
+        "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+        "bitwise_equal_to_triton": true,
+        "changed_elements": 0,
+        "passed": true,
+        "inputs_unchanged": true,
+        "guards_intact": true
+      }
+    },
+    "consumer_lds": {
+      "config": {
+        "BLOCK_SIZE_M": 256,
+        "BLOCK_SIZE_N": 128,
+        "BLOCK_SIZE_K": 64,
+        "GROUP_SIZE_M": 4,
+        "num_warps": 8,
+        "num_stages": 1,
+        "pipeline": "direct",
+        "b_order": "kn",
+        "split_n": false,
+        "direct_operands": "A"
+      },
+      "kernel_grid": [
+        2048,
+        1,
+        1
+      ],
+      "hsaco_sha256": "2250c8e77893310b5d2093643ec68d13f5437d0a1fc3e061f63fc4d0c403c066",
+      "shared_bytes": 16384,
+      "resources": {
+        "n_regs": 215,
+        "n_spills": 0
+      },
+      "validation": {
+        "finite": true,
+        "max_abs_error": 0.130126953125,
+        "rmse": 0.018760165199637413,
+        "reference_rms": 90.51236724853516,
+        "outside_tolerance": 0,
+        "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+        "bitwise_equal_to_triton": true,
+        "changed_elements": 0,
+        "passed": true,
+        "inputs_unchanged": true,
+        "guards_intact": true
+      }
+    },
+    "consumer_lds_B_after0": {
+      "config": {
+        "BLOCK_SIZE_M": 256,
+        "BLOCK_SIZE_N": 128,
+        "BLOCK_SIZE_K": 64,
+        "GROUP_SIZE_M": 4,
+        "num_warps": 8,
+        "num_stages": 1,
+        "pipeline": "direct",
+        "b_order": "kn",
+        "split_n": false,
+        "direct_operands": "A"
+      },
+      "kernel_grid": [
+        2048,
+        1,
+        1
+      ],
+      "hsaco_sha256": "e7801ed2dd14a84269a1ac673e4f92b38f1b92fe1bd8d00585fdac88a00496b0",
+      "shared_bytes": 16384,
+      "resources": {
+        "n_regs": 215,
+        "n_spills": 0
+      },
+      "validation": {
+        "finite": true,
+        "max_abs_error": 0.130126953125,
+        "rmse": 0.018760165199637413,
+        "reference_rms": 90.51236724853516,
+        "outside_tolerance": 0,
+        "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+        "bitwise_equal_to_triton": true,
+        "changed_elements": 0,
+        "passed": true,
+        "inputs_unchanged": true,
+        "guards_intact": true
+      }
+    },
+    "earlyB_double_LDS_bank": {
+      "config": {
+        "BLOCK_SIZE_M": 256,
+        "BLOCK_SIZE_N": 128,
+        "BLOCK_SIZE_K": 64,
+        "GROUP_SIZE_M": 4,
+        "num_warps": 8,
+        "num_stages": 1,
+        "pipeline": "direct",
+        "b_order": "kn",
+        "split_n": false,
+        "direct_operands": "A"
+      },
+      "kernel_grid": [
+        2048,
+        1,
+        1
+      ],
+      "hsaco_sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2",
+      "shared_bytes": 32768,
+      "resources": {
+        "n_regs": 231,
+        "n_spills": 0
+      },
+      "validation": {
+        "finite": true,
+        "max_abs_error": 0.130126953125,
+        "rmse": 0.018760165199637413,
+        "reference_rms": 90.51236724853516,
+        "outside_tolerance": 0,
+        "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+        "bitwise_equal_to_triton": true,
+        "changed_elements": 0,
+        "passed": true,
+        "inputs_unchanged": true,
+        "guards_intact": true
+      }
+    },
+    "tutorial_control": {
+      "config": {
+        "BLOCK_SIZE_M": 256,
+        "BLOCK_SIZE_N": 128,
+        "BLOCK_SIZE_K": 64,
+        "GROUP_SIZE_M": 4,
+        "matrix_instr_nonkdim": 16,
+        "num_warps": 8,
+        "num_stages": 2
+      },
+      "kernel_grid": [
+        2048,
+        1,
+        1
+      ],
+      "hsaco_sha256": "a7b4bbe0a9954b22b5bdac91a85f26499f41df102c3da64f3a3451501c47ec1c",
+      "shared_bytes": 49152,
+      "resources": {
+        "n_regs": 240,
+        "n_spills": 0
+      },
+      "validation": {
+        "finite": true,
+        "max_abs_error": 0.130126953125,
+        "rmse": 0.018760165199637413,
+        "reference_rms": 90.51236724853516,
+        "outside_tolerance": 0,
+        "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+        "bitwise_equal_to_triton": true,
+        "changed_elements": 0,
+        "passed": true,
+        "inputs_unchanged": true,
+        "guards_intact": true
+      }
+    }
+  },
+  "pairs": [
+    {
+      "round": 0,
+      "order": [
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control"
+      ],
+      "current_best": 8.22080557686942,
+      "consumer_lds": 8.348179408482142,
+      "consumer_lds_B_after0": 8.347333635602679,
+      "earlyB_double_LDS_bank": 8.291041237967354,
+      "tutorial_control": 9.831649780273438
+    },
+    {
+      "round": 1,
+      "order": [
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best"
+      ],
+      "consumer_lds": 8.420637948172432,
+      "consumer_lds_B_after0": 8.389100755964007,
+      "earlyB_double_LDS_bank": 8.330448150634766,
+      "tutorial_control": 9.835748944963727,
+      "current_best": 8.439952305385045
+    },
+    {
+      "round": 2,
+      "order": [
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds"
+      ],
+      "consumer_lds_B_after0": 8.40335191999163,
+      "earlyB_double_LDS_bank": 8.32693372453962,
+      "tutorial_control": 9.88753182547433,
+      "current_best": 8.476907457624163,
+      "consumer_lds": 8.422906058175224
+    },
+    {
+      "round": 3,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0"
+      ],
+      "earlyB_double_LDS_bank": 8.307898930140905,
+      "tutorial_control": 9.87060546875,
+      "current_best": 8.498085021972656,
+      "consumer_lds": 8.43345478602818,
+      "consumer_lds_B_after0": 8.353642054966517
+    },
+    {
+      "round": 4,
+      "order": [
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank"
+      ],
+      "tutorial_control": 9.892378670828682,
+      "current_best": 8.471290043422155,
+      "consumer_lds": 8.431375231061663,
+      "consumer_lds_B_after0": 8.383956909179688,
+      "earlyB_double_LDS_bank": 8.329145159040179
+    },
+    {
+      "round": 5,
+      "order": [
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best"
+      ],
+      "tutorial_control": 9.865919930594307,
+      "earlyB_double_LDS_bank": 8.37461417061942,
+      "consumer_lds_B_after0": 8.373579842703682,
+      "consumer_lds": 8.458776201520648,
+      "current_best": 8.459255763462611
+    },
+    {
+      "round": 6,
+      "order": [
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds"
+      ],
+      "current_best": 8.45442145211356,
+      "tutorial_control": 9.912172589983259,
+      "earlyB_double_LDS_bank": 8.37575694492885,
+      "consumer_lds_B_after0": 8.387020656040736,
+      "consumer_lds": 8.468604496547155
+    },
+    {
+      "round": 7,
+      "order": [
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0"
+      ],
+      "consumer_lds": 8.450907570975167,
+      "current_best": 8.509462629045759,
+      "tutorial_control": 9.902137756347656,
+      "earlyB_double_LDS_bank": 8.388346535818917,
+      "consumer_lds_B_after0": 8.393312181745257
+    },
+    {
+      "round": 8,
+      "order": [
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank"
+      ],
+      "consumer_lds_B_after0": 8.40075193132673,
+      "consumer_lds": 8.479307992117745,
+      "current_best": 8.501983097621373,
+      "tutorial_control": 9.904190063476562,
+      "earlyB_double_LDS_bank": 8.39613505772182
+    },
+    {
+      "round": 9,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control"
+      ],
+      "earlyB_double_LDS_bank": 8.384277888706752,
+      "consumer_lds_B_after0": 8.420998164585658,
+      "consumer_lds": 8.471862248011998,
+      "current_best": 8.524417332240514,
+      "tutorial_control": 9.955196925571986
+    },
+    {
+      "round": 10,
+      "order": [
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control"
+      ],
+      "current_best": 8.533246176583427,
+      "consumer_lds": 8.479673658098493,
+      "consumer_lds_B_after0": 8.434981754847936,
+      "earlyB_double_LDS_bank": 8.382055010114398,
+      "tutorial_control": 9.929876055036273
+    },
+    {
+      "round": 11,
+      "order": [
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best"
+      ],
+      "consumer_lds": 8.508668627057757,
+      "consumer_lds_B_after0": 8.428039005824498,
+      "earlyB_double_LDS_bank": 8.388580867222377,
+      "tutorial_control": 9.92010498046875,
+      "current_best": 8.539035252162389
+    },
+    {
+      "round": 12,
+      "order": [
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds"
+      ],
+      "consumer_lds_B_after0": 8.437855856759208,
+      "earlyB_double_LDS_bank": 8.406027657645089,
+      "tutorial_control": 9.971175057547432,
+      "current_best": 8.55838394165039,
+      "consumer_lds": 8.49816622052874
+    },
+    {
+      "round": 13,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0"
+      ],
+      "earlyB_double_LDS_bank": 8.390959058489118,
+      "tutorial_control": 9.948414393833705,
+      "current_best": 8.56649889264788,
+      "consumer_lds": 8.515829903738839,
+      "consumer_lds_B_after0": 8.452736990792411
+    },
+    {
+      "round": 14,
+      "order": [
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank"
+      ],
+      "tutorial_control": 9.97085462297712,
+      "current_best": 8.53727558680943,
+      "consumer_lds": 8.50580106462751,
+      "consumer_lds_B_after0": 8.455245426722936,
+      "earlyB_double_LDS_bank": 8.406278882707868
+    },
+    {
+      "round": 15,
+      "order": [
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best"
+      ],
+      "tutorial_control": 9.955620901925224,
+      "earlyB_double_LDS_bank": 8.42520523071289,
+      "consumer_lds_B_after0": 8.454165867396764,
+      "consumer_lds": 8.504281180245536,
+      "current_best": 8.572762080601283
+    },
+    {
+      "round": 16,
+      "order": [
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds"
+      ],
+      "current_best": 8.531984601702009,
+      "tutorial_control": 10.00740487234933,
+      "earlyB_double_LDS_bank": 8.441868373325892,
+      "consumer_lds_B_after0": 8.463057926722936,
+      "consumer_lds": 8.53637967790876
+    },
+    {
+      "round": 17,
+      "order": [
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0"
+      ],
+      "consumer_lds": 8.54075677054269,
+      "current_best": 8.545327867780413,
+      "tutorial_control": 10.025754656110491,
+      "earlyB_double_LDS_bank": 8.457526070731026,
+      "consumer_lds_B_after0": 8.45791516985212
+    },
+    {
+      "round": 18,
+      "order": [
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank"
+      ],
+      "consumer_lds_B_after0": 8.45811516898019,
+      "consumer_lds": 8.54958506992885,
+      "current_best": 8.566396985735212,
+      "tutorial_control": 10.002086094447545,
+      "earlyB_double_LDS_bank": 8.46670423235212
+    },
+    {
+      "round": 19,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control"
+      ],
+      "earlyB_double_LDS_bank": 8.442972455705915,
+      "consumer_lds_B_after0": 8.483710152762276,
+      "consumer_lds": 8.53431647164481,
+      "current_best": 8.54129409790039,
+      "tutorial_control": 10.004056658063616
+    },
+    {
+      "round": 20,
+      "order": [
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control"
+      ],
+      "current_best": 8.592500959123884,
+      "consumer_lds": 8.539145878383092,
+      "consumer_lds_B_after0": 8.457035609654017,
+      "earlyB_double_LDS_bank": 8.442303793770927,
+      "tutorial_control": 10.016709463936943
+    },
+    {
+      "round": 21,
+      "order": [
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best"
+      ],
+      "consumer_lds": 8.54362051827567,
+      "consumer_lds_B_after0": 8.491996765136719,
+      "earlyB_double_LDS_bank": 8.440326690673828,
+      "tutorial_control": 10.023235866001674,
+      "current_best": 8.567575182233538
+    },
+    {
+      "round": 22,
+      "order": [
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds"
+      ],
+      "consumer_lds_B_after0": 8.490333557128906,
+      "earlyB_double_LDS_bank": 8.469470977783203,
+      "tutorial_control": 10.042013985770089,
+      "current_best": 8.551535470145089,
+      "consumer_lds": 8.549821036202568
+    },
+    {
+      "round": 23,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0"
+      ],
+      "earlyB_double_LDS_bank": 8.45533915928432,
+      "tutorial_control": 10.026870727539062,
+      "current_best": 8.618868146623884,
+      "consumer_lds": 8.531786237444196,
+      "consumer_lds_B_after0": 8.49145998273577
+    },
+    {
+      "round": 24,
+      "order": [
+        "tutorial_control",
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank"
+      ],
+      "tutorial_control": 10.069986615862165,
+      "current_best": 8.576227460588727,
+      "consumer_lds": 8.57603291102818,
+      "consumer_lds_B_after0": 8.476237160818917,
+      "earlyB_double_LDS_bank": 8.458196912493024
+    },
+    {
+      "round": 25,
+      "order": [
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best"
+      ],
+      "tutorial_control": 10.044105529785156,
+      "earlyB_double_LDS_bank": 8.48510033743722,
+      "consumer_lds_B_after0": 8.468894958496094,
+      "consumer_lds": 8.57206780569894,
+      "current_best": 8.560775756835938
+    },
+    {
+      "round": 26,
+      "order": [
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds"
+      ],
+      "current_best": 8.613142830984932,
+      "tutorial_control": 10.024990626743861,
+      "earlyB_double_LDS_bank": 8.481249128069196,
+      "consumer_lds_B_after0": 8.496883937290736,
+      "consumer_lds": 8.57337134225028
+    },
+    {
+      "round": 27,
+      "order": [
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0"
+      ],
+      "consumer_lds": 8.54615947178432,
+      "current_best": 8.56043951851981,
+      "tutorial_control": 10.051895141601562,
+      "earlyB_double_LDS_bank": 8.46804918561663,
+      "consumer_lds_B_after0": 8.522793361118861
+    },
+    {
+      "round": 28,
+      "order": [
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control",
+        "earlyB_double_LDS_bank"
+      ],
+      "consumer_lds_B_after0": 8.492838723318917,
+      "consumer_lds": 8.565748487200056,
+      "current_best": 8.590994698660714,
+      "tutorial_control": 10.012392316545759,
+      "earlyB_double_LDS_bank": 8.522256578717913
+    },
+    {
+      "round": 29,
+      "order": [
+        "earlyB_double_LDS_bank",
+        "consumer_lds_B_after0",
+        "consumer_lds",
+        "current_best",
+        "tutorial_control"
+      ],
+      "earlyB_double_LDS_bank": 8.469901493617467,
+      "consumer_lds_B_after0": 8.491610390799385,
+      "consumer_lds": 8.550194331577845,
+      "current_best": 8.614178248814174,
+      "tutorial_control": 10.037147521972656
+    },
+    {
+      "round": 30,
+      "order": [
+        "current_best",
+        "consumer_lds",
+        "consumer_lds_B_after0",
+        "earlyB_double_LDS_bank",
+        "tutorial_control"
+      ],
+      "current_best": 8.61089815412249,
+      "consumer_lds": 8.566663469587054,
+      "consumer_lds_B_after0": 8.520228794642858,
+      "earlyB_double_LDS_bank": 8.481661660330635,
+      "tutorial_control": 10.040953499930245
+    }
+  ],
+  "median_ms": {
+    "current_best": 8.545327867780413,
+    "consumer_lds": 8.515829903738839,
+    "consumer_lds_B_after0": 8.455245426722936,
+    "earlyB_double_LDS_bank": 8.42520523071289,
+    "tutorial_control": 9.971175057547432
+  },
+  "paired_speedup_vs_current_best": {
+    "current_best": 1.0,
+    "consumer_lds": 1.0035689044239031,
+    "consumer_lds_B_after0": 1.011557499034132,
+    "earlyB_double_LDS_bank": 1.0150762519299537,
+    "tutorial_control": 0.8574218950663062
+  },
+  "tflops": {
+    "current_best": 128.6681616888727,
+    "consumer_lds": 129.11385504462274,
+    "consumer_lds_B_after0": 130.03899618347876,
+    "earlyB_double_LDS_bank": 130.5026521808497,
+    "tutorial_control": 110.26901257176827
+  },
+  "post_timing_validation": {
+    "current_best": {
+      "finite": true,
+      "max_abs_error": 0.130126953125,
+      "rmse": 0.018760165199637413,
+      "reference_rms": 90.51236724853516,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "consumer_lds": {
+      "finite": true,
+      "max_abs_error": 0.130126953125,
+      "rmse": 0.018760165199637413,
+      "reference_rms": 90.51236724853516,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "consumer_lds_B_after0": {
+      "finite": true,
+      "max_abs_error": 0.130126953125,
+      "rmse": 0.018760165199637413,
+      "reference_rms": 90.51236724853516,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "earlyB_double_LDS_bank": {
+      "finite": true,
+      "max_abs_error": 0.130126953125,
+      "rmse": 0.018760165199637413,
+      "reference_rms": 90.51236724853516,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    },
+    "tutorial_control": {
+      "finite": true,
+      "max_abs_error": 0.130126953125,
+      "rmse": 0.018760165199637413,
+      "reference_rms": 90.51236724853516,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "bitwise_equal_to_triton": true,
+      "changed_elements": 0,
+      "passed": true,
+      "inputs_unchanged": true,
+      "guards_intact": true
+    }
+  }
+}

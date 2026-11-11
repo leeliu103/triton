@@ -1,5 +1,28 @@
 # gfx1201 GEMM: Gluon and direct assembly optimization
 
+> **Update, 2026-11-11.** Two later kernels, `eight_chunk_asm` and
+> `double_lds_bank_asm`, are now in this package, and the results were
+> independently re-verified. See [VERIFICATION.md](VERIFICATION.md). Points that
+> change how this summary should be read:
+>
+> - The runtimes below come from short runs (under about 20 seconds). On this
+>   card the clock is set by a 300 W power cap and then by the 110 °C junction
+>   limit. In sustained runs the two later kernels were about 2–7% slower than
+>   in short runs and the tutorial 4–7% slower. The four kernels below were not
+>   re-timed sustained.
+> - Coverage percentages are modeled service on one SIMD per capture. Variation
+>   of up to about 0.9 points was seen between two captures of one binary, and
+>   the percentage is not a speed metric: a busier kernel runs at a lower clock
+>   under the power cap.
+> - The statement below that B double buffering did not help refers to the
+>   earlier attempt on `optimized_asm`. A later two-LDS-bank design on top of
+>   consumer-ready waits and earlier B prefetch (`double_lds_bank_asm`) is
+>   faster by a small margin (+0.2–0.4% for the two-bank step alone).
+> - The exact Triton build was `3.8.0+git4cff872c.rocm10.0.0`.
+>
+> The text below is otherwise unchanged from the original study of the first
+> four kernels.
+
 On a Radeon AI PRO R9700, the selected FP16 GEMM improved from **9.913 ms to
 8.569 ms** for **M = N = K = 8192**. This is **15.76% higher throughput**
 (13.62% less latency), reaching **128.31 TFLOP/s**. Combined WMMA and ordinary

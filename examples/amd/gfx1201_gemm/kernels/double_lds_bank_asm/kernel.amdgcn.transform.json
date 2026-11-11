@@ -1,0 +1,769 @@
+{
+  "input_sha256": "92dbde5471224cb6348c3733a788d5f25efcd9d6de907d1f4a92d3348e9ef617",
+  "output_sha256": "df49252dbb4f656b76d3b7ab674e3576effc5b85901332d90b8261da51257693",
+  "required_dynamic_shared_bytes": 32768,
+  "operations": [
+    {
+      "kind": "B_loads_first_A_waits_at_first_consumers",
+      "old_global_order": "A0..A7 B0..B3",
+      "new_global_order": "B0..B3 A0..A7",
+      "B_packing_waits": [
+        11,
+        10,
+        8
+      ],
+      "A_first_consumer_waits": [
+        {
+          "before_WMMA": 1,
+          "A_request": 0,
+          "loadcnt": 7,
+          "destination": [
+            167,
+            170
+          ]
+        },
+        {
+          "before_WMMA": 9,
+          "A_request": 4,
+          "loadcnt": 3,
+          "destination": [
+            163,
+            166
+          ]
+        },
+        {
+          "before_WMMA": 18,
+          "A_request": 5,
+          "loadcnt": 2,
+          "destination": [
+            155,
+            158
+          ]
+        },
+        {
+          "before_WMMA": 37,
+          "A_request": 6,
+          "loadcnt": 1,
+          "destination": [
+            147,
+            150
+          ]
+        },
+        {
+          "before_WMMA": 53,
+          "A_request": 7,
+          "loadcnt": 0,
+          "destination": [
+            139,
+            142
+          ]
+        }
+      ],
+      "original_named_VGPRs": 214,
+      "new_named_VGPRs": 215,
+      "old_and_new_rounded_VGPRs": 216,
+      "additional_vector_copies": 0,
+      "WMMA_and_LDS_instruction_sequences_unchanged": true,
+      "LDS_and_scratch_unchanged": true
+    },
+    {
+      "kind": "earlier_entry_barrier_arrival",
+      "remaining_WMMA": 8,
+      "all_LDS_reads_complete_before_signal": true,
+      "next_iteration_wait_before_any_store": true,
+      "first_iteration_supplied_with_initial_signal": true,
+      "resources_unchanged": true
+    },
+    {
+      "kind": "next_B_prefetch_with_12_WMMA_remaining",
+      "global_B_requests": 4,
+      "restoring_copies": 0,
+      "new_registers": 0,
+      "prefetch_written_registers": [
+        129,
+        130,
+        131,
+        132,
+        133,
+        135,
+        136,
+        137,
+        138,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178
+      ],
+      "remaining_WMMA_live_registers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213
+      ],
+      "written_registers_disjoint_from_remaining_operands": true,
+      "current_A_global_loads_complete_before_prefetch": true,
+      "initial_B_requests_in_prologue": true,
+      "last_iteration_skips_prefetch": true,
+      "next_iteration_counter_order": "previous B0..B3 then current A0..A7",
+      "WMMA_LDS_and_resource_requirements_unchanged": true
+    },
+    {
+      "kind": "explicit_B_register_cluster_schedule",
+      "clusters": 8,
+      "LDS_loads_per_memory_cluster": 4,
+      "WMMA_per_compute_cluster": 8,
+      "phase_shift": false,
+      "memory_priority": 0,
+      "compute_priority_after_first_WMMA": 0,
+      "named_VGPR": 215,
+      "expected_full_CTA_resident_waves_per_SIMD": 6,
+      "matrix_instruction_order": "pair both M halves for each four B fragments",
+      "per_accumulator_K_order_and_symbolic_operand_values_identical": true,
+      "global_B_prefetch_request_values_identical": true,
+      "next_B_prefetch_after_emitted_WMMA": 52,
+      "B_memory_is_read_only_throughout_asymmetric_region": true,
+      "no_extra_VALU_or_WMMA_instructions": true,
+      "GPU_validation_required": true
+    },
+    {
+      "waits": [
+        {
+          "before_input_index": 6,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@0"
+          ]
+        },
+        {
+          "before_input_index": 7,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@1"
+          ]
+        },
+        {
+          "before_input_index": 8,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@2"
+          ]
+        },
+        {
+          "before_input_index": 9,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@3"
+          ]
+        },
+        {
+          "before_input_index": 19,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@14"
+          ]
+        },
+        {
+          "before_input_index": 20,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@15"
+          ]
+        },
+        {
+          "before_input_index": 21,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@16"
+          ]
+        },
+        {
+          "before_input_index": 22,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@17"
+          ]
+        },
+        {
+          "before_input_index": 33,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@27"
+          ]
+        },
+        {
+          "before_input_index": 35,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@28"
+          ]
+        },
+        {
+          "before_input_index": 36,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@29"
+          ]
+        },
+        {
+          "before_input_index": 38,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@30"
+          ]
+        },
+        {
+          "before_input_index": 46,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@41"
+          ]
+        },
+        {
+          "before_input_index": 47,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@42"
+          ]
+        },
+        {
+          "before_input_index": 48,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@43"
+          ]
+        },
+        {
+          "before_input_index": 49,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@44"
+          ]
+        },
+        {
+          "before_input_index": 60,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@54"
+          ]
+        },
+        {
+          "before_input_index": 61,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@55"
+          ]
+        },
+        {
+          "before_input_index": 62,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@56"
+          ]
+        },
+        {
+          "before_input_index": 63,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@57"
+          ]
+        },
+        {
+          "before_input_index": 73,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@68"
+          ]
+        },
+        {
+          "before_input_index": 74,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@69"
+          ]
+        },
+        {
+          "before_input_index": 75,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@70"
+          ]
+        },
+        {
+          "before_input_index": 77,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@71"
+          ]
+        },
+        {
+          "before_input_index": 87,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@81"
+          ]
+        },
+        {
+          "before_input_index": 88,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@82"
+          ]
+        },
+        {
+          "before_input_index": 89,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@83"
+          ]
+        },
+        {
+          "before_input_index": 90,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@84"
+          ]
+        },
+        {
+          "before_input_index": 110,
+          "queue": "lds",
+          "threshold": 3,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@105"
+          ]
+        },
+        {
+          "before_input_index": 111,
+          "queue": "lds",
+          "threshold": 2,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@106"
+          ]
+        },
+        {
+          "before_input_index": 114,
+          "queue": "lds",
+          "threshold": 1,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@107"
+          ]
+        },
+        {
+          "before_input_index": 115,
+          "queue": "lds",
+          "threshold": 0,
+          "reason": "register RAW/WAW",
+          "retires": [
+            "lds@108"
+          ]
+        }
+      ],
+      "pending_at_exit": {
+        "lds": []
+      },
+      "kind": "consumer_ready_waits",
+      "manages_LDS": true,
+      "manages_global": false,
+      "initial_global_order": [
+        "A0",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7"
+      ],
+      "unchanged_data_and_control_instructions": true,
+      "symbolic_accumulator_histories_identical": true,
+      "conditional_B_prefetch_current_A_fence": false,
+      "queue_contract": "ordered completion for same-kind ds_load_2addr_b64 and buffer_load_b128 requests",
+      "named_VGPR": 215,
+      "physical_VGPR": 216,
+      "dynamic_LDS_bytes": 16384,
+      "GPU_validation_required": true
+    },
+    {
+      "prefetch_written_registers": [
+        129,
+        130,
+        131,
+        132,
+        133,
+        135,
+        136,
+        137,
+        138,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178
+      ],
+      "prefetch_written_registers_dead_throughout_remaining_compute": true,
+      "after_WMMA": 0,
+      "kind": "dead_register_next_B_prefetch",
+      "old_after_WMMA": 52,
+      "A_wait_thresholds_after_prefetch_before": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "A_wait_thresholds_after_prefetch_new": [
+        7,
+        6,
+        5,
+        4
+      ],
+      "final_no_prefetch_path_drains_current_A_before_join": true,
+      "symbolic_accumulator_histories_identical": true,
+      "exact_dynamic_vector_memory_instruction_multiset": true,
+      "named_VGPR": 215,
+      "physical_VGPR": 216,
+      "dynamic_LDS_bytes": 16384,
+      "additional_vector_instructions": 0,
+      "additional_VGPR": 0,
+      "GPU_validation_required": true
+    },
+    {
+      "kind": "two_version_B_LDS_publication_only_pipeline",
+      "K64_steps": 128,
+      "K_loop_unroll_factor": 2,
+      "loop_trip_count": 64,
+      "loop_counter_register": "s2",
+      "alternate_address_registers": {
+        "182": 215,
+        "183": 216,
+        "184": 217,
+        "185": 218,
+        "186": 219,
+        "187": 220,
+        "188": 221,
+        "189": 222,
+        "190": 223,
+        "191": 224,
+        "192": 225,
+        "193": 226,
+        "194": 227,
+        "195": 228,
+        "196": 229,
+        "197": 230
+      },
+      "precomputed_address_instruction_count_per_wave": 16,
+      "extra_dynamic_ordinary_VALU_wave_instructions_8192cube": 262144,
+      "old_modeled_combined_service_numerator": 2221293568,
+      "new_modeled_combined_service_numerator": 2221555712,
+      "per_iteration_address_arithmetic_added": 0,
+      "each_cloned_iteration_identical_after_LDS_address_and_label_normalization": true,
+      "dynamic_vector_and_memory_instruction_multiset_identical_after_bank_normalization_and_prologue_adds": true,
+      "barrier_epoch_proof": {
+        "iteration_0": "bank0 has no previous reader",
+        "iteration_1": "bank1 has no previous reader",
+        "iteration_t_ge_2": "store(t) follows publish(t-1); all waves reached publish(t-1) only after completing read(t-2), so bank(t%2) is free",
+        "publication": "each wave waits dscnt0 before arrival; every read(t) follows all-wave publication(t)",
+        "no_reuse_barrier_required": true,
+        "original_dynamic_signal_wait_counts_per_CTA": [
+          257,
+          256
+        ],
+        "new_dynamic_signal_wait_counts_per_CTA": [
+          128,
+          128
+        ],
+        "no_unconsumed_arrival_at_kernel_exit": true
+      },
+      "LDS_address_proof": {
+        "CTA_store_bytes": 16384,
+        "CTA_store_multiplicity": 1,
+        "each_wave_reads_exact_same_16384_byte_bank": true,
+        "bank_ranges": [
+          [
+            0,
+            16383
+          ],
+          [
+            16384,
+            32767
+          ]
+        ],
+        "banks_disjoint": true,
+        "all_effective_addresses_below_required_LDS_bytes": true
+      },
+      "global_queue_audit": {
+        "passed": true,
+        "modeled_K64_steps": 128,
+        "unrolled_loop_trip_count": 64,
+        "global_requests": 1536,
+        "every_original_global_request_exactly_128_times": true,
+        "checked_vector_LDS_instructions": 17533,
+        "states": [
+          {
+            "iteration": 0,
+            "bank": 0,
+            "pending_at_exit": 4
+          },
+          {
+            "iteration": 1,
+            "bank": 1,
+            "pending_at_exit": 4
+          },
+          {
+            "iteration": 126,
+            "bank": 0,
+            "pending_at_exit": 4
+          },
+          {
+            "iteration": 127,
+            "bank": 1,
+            "pending_at_exit": 0
+          }
+        ]
+      },
+      "named_VGPR": 231,
+      "physical_VGPR": 240,
+      "dynamic_LDS_bytes": 32768,
+      "expected_full_CTA_resident_waves_per_SIMD": 6,
+      "GPU_validation_required": true
+    }
+  ],
+  "source_baseline": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/candidate-004/compiled/kernel.amdgcn",
+  "generator_sha256": "7a8a73946e75876d7296064e05fde5748e5be212c373ad09b99dd35fbf6f2f6d",
+  "gpu_executed": false,
+  "limits": "Requires root numeric validation and SQTT actual residency check.",
+  "parent_variant": "/app/att/triton-gemm-asm/saturation/asm/early-b/consumer_lds_B_after0/kernel.amdgcn",
+  "parent_variant_sha256": "f2b7023cbca142b4365583dbf35191f6dab6881df488d9337e2336a43cbc9ee0",
+  "assembly": {
+    "cpu_only": true,
+    "hsaco_sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2",
+    "binary_metadata_matches_validated_source": true
+  },
+  "pending_register_audit": {
+    "passed": true,
+    "modeled_K64_steps": 128,
+    "unrolled_loop_trip_count": 64,
+    "global_requests": 1536,
+    "every_original_global_request_exactly_128_times": true,
+    "checked_vector_LDS_instructions": 17533,
+    "states": [
+      {
+        "iteration": 0,
+        "bank": 0,
+        "pending_at_exit": 4
+      },
+      {
+        "iteration": 1,
+        "bank": 1,
+        "pending_at_exit": 4
+      },
+      {
+        "iteration": 126,
+        "bank": 0,
+        "pending_at_exit": 4
+      },
+      {
+        "iteration": 127,
+        "bank": 1,
+        "pending_at_exit": 0
+      }
+    ]
+  },
+  "scheduler_sha256": "535118d1208862ba56187aff11fc85567cf6df385f691e62bbab0ce40ae3d09d"
+}

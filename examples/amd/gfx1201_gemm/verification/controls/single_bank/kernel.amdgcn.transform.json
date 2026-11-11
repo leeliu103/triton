@@ -1,0 +1,10 @@
+{
+  "input_sha256": "92dbde5471224cb6348c3733a788d5f25efcd9d6de907d1f4a92d3348e9ef617",
+  "output_sha256": "f40a9791a3634855bc0d682a7d10804931f949286f3d1b41b617fbefa7b62a52",
+  "required_dynamic_shared_bytes": 32768,
+  "kind": "negative_control_not_a_candidate",
+  "parent_variant": "/app/att/triton-gemm-asm/saturation/asm/double-lds-bank/earlyB_double_LDS_bank/kernel.amdgcn",
+  "parent_sha256": "df49252dbb4f656b76d3b7ab674e3576effc5b85901332d90b8261da51257693",
+  "edit": "alternate LDS addresses v215..v230 set equal to bank 0 (16 adds of 0x4000 become adds of 0)",
+  "purpose": "Both loop bodies use bank 0, with the winner's one barrier per step."
+}

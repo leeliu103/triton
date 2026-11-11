@@ -26,6 +26,17 @@ def verify_artifacts(manifest=None):
             actual = hashlib.sha256(path.read_bytes()).hexdigest()
             if actual != artifact["sha256"]:
                 raise ValueError(f"{name}: {kind} SHA256 differs from manifest: {actual}")
+        sidecar = kernel.get("transform_sidecar")
+        if sidecar:
+            data = (ROOT / sidecar["path"]).read_bytes()
+            if hashlib.sha256(data).hexdigest() != sidecar["sha256"]:
+                raise ValueError(f"{name}: transform sidecar SHA256 differs from manifest")
+            transform = json.loads(data)
+            if transform["output_sha256"] != kernel["artifacts"]["amdgcn"]["sha256"]:
+                raise ValueError(f"{name}: transform sidecar does not describe the archived assembly")
+            required = transform.get("required_dynamic_shared_bytes")
+            if required is not None and kernel["dynamic_shared_bytes"] < required:
+                raise ValueError(f"{name}: manifest dynamic LDS is below the transform's requirement")
     return manifest
 
 

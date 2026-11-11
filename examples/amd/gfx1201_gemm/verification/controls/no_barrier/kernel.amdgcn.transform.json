@@ -1,0 +1,10 @@
+{
+  "input_sha256": "92dbde5471224cb6348c3733a788d5f25efcd9d6de907d1f4a92d3348e9ef617",
+  "output_sha256": "a59500e37ceca62156a1ddb5638ec91c3b3ff20f7209ec873605a8456ec39966",
+  "required_dynamic_shared_bytes": 32768,
+  "kind": "negative_control_not_a_candidate",
+  "parent_variant": "/app/att/triton-gemm-asm/saturation/asm/double-lds-bank/earlyB_double_LDS_bank/kernel.amdgcn",
+  "parent_sha256": "df49252dbb4f656b76d3b7ab674e3576effc5b85901332d90b8261da51257693",
+  "edit": "both s_barrier_signal/s_barrier_wait pairs deleted",
+  "purpose": "Remove the publication barrier in both loop bodies."
+}

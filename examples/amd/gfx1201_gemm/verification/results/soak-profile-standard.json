@@ -1,0 +1,102 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "pattern": "normal",
+  "seeds": [
+    20261231,
+    20261232
+  ],
+  "argv": [
+    "soak.py",
+    "--entries",
+    "soak-winner.json",
+    "--out",
+    "runs/soak-profile-standard",
+    "--seeds",
+    "20261231",
+    "20261232",
+    "--interleaved",
+    "200",
+    "--burst-rounds",
+    "12"
+  ],
+  "performance_mode": "profile_standard",
+  "torch": "2.12.0+rocm10.0.0",
+  "triton": "3.8.0",
+  "entries": [
+    {
+      "name": "winner",
+      "module": "gluon.direct_load",
+      "config": "/app/att/triton-gemm-asm/results/phase2-direct-load-controls/config.json",
+      "variant": "/app/att/triton-gemm-asm/saturation/asm/double-lds-bank/earlyB_double_LDS_bank/kernel.amdgcn"
+    }
+  ],
+  "runs": [
+    {
+      "seed": 20261231,
+      "name": "winner",
+      "hsaco_sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2",
+      "shared_bytes": 32768,
+      "reference_repeat_changed_elements": 0,
+      "interleaved": {
+        "launches": 200,
+        "failing_launches": 0,
+        "first_failing_index": null,
+        "max_changed_elements": 0,
+        "total_changed_elements": 0,
+        "failing_counts_first_32": []
+      },
+      "burst": {
+        "launches": 192,
+        "failing_launches": 0,
+        "first_failing_index": null,
+        "max_changed_elements": 0,
+        "total_changed_elements": 0,
+        "failing_counts_first_32": []
+      },
+      "inputs_unchanged": true,
+      "guards_intact": true,
+      "seconds": 20.50117276678793
+    },
+    {
+      "seed": 20261232,
+      "name": "winner",
+      "hsaco_sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2",
+      "shared_bytes": 32768,
+      "reference_repeat_changed_elements": 0,
+      "interleaved": {
+        "launches": 200,
+        "failing_launches": 0,
+        "first_failing_index": null,
+        "max_changed_elements": 0,
+        "total_changed_elements": 0,
+        "failing_counts_first_32": []
+      },
+      "burst": {
+        "launches": 192,
+        "failing_launches": 0,
+        "first_failing_index": null,
+        "max_changed_elements": 0,
+        "total_changed_elements": 0,
+        "failing_counts_first_32": []
+      },
+      "inputs_unchanged": true,
+      "guards_intact": true,
+      "seconds": 20.496648306027055
+    }
+  ],
+  "elapsed_seconds": 42.650883686961606,
+  "summary": {
+    "winner": {
+      "hsaco_sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2",
+      "launches": 784,
+      "failing_launches": 0,
+      "seeds": 2,
+      "all_inputs_unchanged": true,
+      "all_guards_intact": true
+    }
+  }
+}

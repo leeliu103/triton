@@ -1,16 +1,26 @@
 # R9700 / gfx1201 GEMM kernel study
 
-This package contains **Previous best ASM**, **New A-direct Gluon**, and
-**Gluon + optimized ASM**, plus the original tutorial reference. The measured
-result is **15.76% higher throughput** and **92.30% combined VALU coverage** for
-8192³ FP16 GEMM. Read [SUMMARY.md](SUMMARY.md) for the changes, correctness,
-coalescing tradeoff, profiling methods, and remaining bottleneck.
+This package contains six exact kernels for 8192³ FP16 GEMM: the original
+tutorial reference, **Previous best ASM**, **New A-direct Gluon**,
+**Gluon + optimized ASM**, and two later assembly steps, **eight-chunk ASM** and
+**double-LDS-bank ASM**. The double-bank kernel is the fastest: about **18%
+faster than the tutorial in short runs and 19–21% sustained**, and
+**0.5–1.6% faster than the eight-chunk kernel** depending on how hard the card
+is throttling, with about **94% modeled combined VALU coverage**. Every one of 8,784 checked launches is bit-exact.
+
+Read [VERIFICATION.md](VERIFICATION.md) first for the current, independently
+re-verified numbers and their limits. [SUMMARY.md](SUMMARY.md) describes the
+first four kernels and the original measurements, and
+[MEASURING_UTILIZATION.md](MEASURING_UTILIZATION.md) explains the two
+utilization methods.
 
 - [kernels/](kernels/): exact `.amdgcn` and `.hsaco` artifacts.
 - [manifest.json](manifest.json): hashes, target, dimensions, launch ABI, and LDS.
 - [source/](source/): frozen tutorial and Gluon Python sources/configurations.
 - [evidence/](evidence/): historical paired timing, correctness, and profiling data.
 - [benchmark.py](benchmark.py): portable correctness/timing and capture runner.
+- [transforms/](transforms/): the scripts that produced the two later assembly kernels (study provenance, not relocated).
+- [verification/](verification/): soak and steady-state timing harness, broken negative controls, and raw results.
 
 ## Run the exact kernels
 
@@ -60,11 +70,13 @@ python benchmark.py --capture-only --kernel optimized_asm --launches 6 \
 ```
 
 Pass that command to the SDK, sqttkit, or ROCm Compute installation linked in
-the summary. Both new kernels have the symbol `gemm`; the tutorial and previous
+the summary. The Gluon-derived kernels have the symbol `gemm`; the tutorial and previous
 ASM use `matmul_kernel`. For SQTT, capture the sixth dispatch after five warmups,
 keep the trace/database/code objects together, and require complete waves with
 zero lost packets or unknown PCs. `--kernel` also accepts `previous_best_asm`,
-`a_direct_gluon`, and `tutorial_baseline`.
+`a_direct_gluon`, `tutorial_baseline`, `eight_chunk_asm`, and
+`double_lds_bank_asm`. The double-bank kernel needs 32,768 bytes of dynamic LDS,
+which the manifest supplies; do not launch its code object with less.
 
 Measure speed separately in AUTO. In the supplied stack, exact instruction
 counters required controlled `profile_standard` collection; known-nonzero

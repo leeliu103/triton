@@ -1,11 +1,13 @@
 {
-  "schema_version": 1,
-  "description": "Exact archived8192x8192x8192 FP16 GEMM code objects; FP32 accumulation; gfx1201 only.",
+  "schema_version": 2,
+  "description": "Exact archived 8192x8192x8192 FP16 GEMM code objects; FP32 accumulation; gfx1201 only.",
   "benchmark_order": [
     "tutorial_baseline",
     "previous_best_asm",
     "a_direct_gluon",
-    "optimized_asm"
+    "optimized_asm",
+    "eight_chunk_asm",
+    "double_lds_bank_asm"
   ],
   "kernels": {
     "tutorial_baseline": {
@@ -443,6 +445,191 @@
           "sha256": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0"
         }
       }
+    },
+    "eight_chunk_asm": {
+      "symbol": "gemm",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 16384,
+      "kernarg_bytes": 40,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 24,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 32,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 215,
+        ".sgpr_count": 21,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/eight_chunk_asm/kernel.amdgcn",
+          "sha256": "0138c136bfc70e0052dd81901a9bea84838a7d6bdbd8287f652412e4a05b92dd"
+        },
+        "hsaco": {
+          "path": "kernels/eight_chunk_asm/kernel.hsaco",
+          "sha256": "7e5e7a726987ffd777be2aa70adec4c6401116dc1d3f73810cfdf0e798670a34"
+        }
+      },
+      "transform_sidecar": {
+        "path": "kernels/eight_chunk_asm/kernel.amdgcn.transform.json",
+        "sha256": "81e92dade82dcb53d04faa538ebb529d1cb50be181cedeb7e9c503f2b4642ee2"
+      }
+    },
+    "double_lds_bank_asm": {
+      "symbol": "gemm",
+      "gfx": "gfx1201",
+      "shape_mnk": [
+        8192,
+        8192,
+        8192
+      ],
+      "strides": {
+        "a": [
+          8192,
+          1
+        ],
+        "b": [
+          8192,
+          1
+        ],
+        "c": [
+          8192,
+          1
+        ]
+      },
+      "grid": [
+        2048,
+        1,
+        1
+      ],
+      "block": [
+        256,
+        1,
+        1
+      ],
+      "dynamic_shared_bytes": 32768,
+      "kernarg_bytes": 40,
+      "kernarg_fields": [
+        {
+          "name": "a",
+          "type": "pointer",
+          "tensor": "a",
+          "offset": 0,
+          "size": 8
+        },
+        {
+          "name": "b",
+          "type": "pointer",
+          "tensor": "b",
+          "offset": 8,
+          "size": 8
+        },
+        {
+          "name": "c",
+          "type": "pointer",
+          "tensor": "c",
+          "offset": 16,
+          "size": 8
+        },
+        {
+          "name": "global_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 24,
+          "size": 8
+        },
+        {
+          "name": "profile_scratch",
+          "type": "pointer",
+          "value": 0,
+          "offset": 32,
+          "size": 8
+        }
+      ],
+      "resources": {
+        ".vgpr_count": 231,
+        ".sgpr_count": 21,
+        ".private_segment_fixed_size": 0,
+        ".group_segment_fixed_size": 0
+      },
+      "artifacts": {
+        "amdgcn": {
+          "path": "kernels/double_lds_bank_asm/kernel.amdgcn",
+          "sha256": "df49252dbb4f656b76d3b7ab674e3576effc5b85901332d90b8261da51257693"
+        },
+        "hsaco": {
+          "path": "kernels/double_lds_bank_asm/kernel.hsaco",
+          "sha256": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2"
+        }
+      },
+      "transform_sidecar": {
+        "path": "kernels/double_lds_bank_asm/kernel.amdgcn.transform.json",
+        "sha256": "1f71e1f0a94f85ad30d1b01b72bdd1d91be4f14781281c0df389b227366c9f57"
+      },
+      "launch_note": "The code object declares no static LDS. It addresses two 16 KiB banks, so it MUST be launched with at least 32768 bytes of dynamic LDS; the HSACO hash does not encode this."
     }
   }
 }

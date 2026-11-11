@@ -1,0 +1,662 @@
+{
+  "shape_mnk": [
+    8192,
+    8192,
+    8192
+  ],
+  "dtype": "FP16 inputs/output; FP32 accumulation",
+  "seed": 20261401,
+  "pattern": "normal",
+  "torch": "2.12.0+rocm10.0.0",
+  "device": "AMD Radeon AI PRO R9700 gfx1201",
+  "dense_flops": 1099511627776,
+  "launch_method": "HIP module launch of hash-checked archived code objects",
+  "hip_runtime_library": "/opt/python/lib/python3.14/site-packages/_rocm_sdk_core/lib/libamdhip64.so.7",
+  "hsaco_sha256": {
+    "tutorial_baseline": "a7b4bbe0a9954b22b5bdac91a85f26499f41df102c3da64f3a3451501c47ec1c",
+    "previous_best_asm": "ac241678c55246a174add15facd621680dbb52a18ec6b8b8f95ea485e41a59ad",
+    "a_direct_gluon": "d50d8d83b7e7425aca966e86d595129b988ac09d103ea6a8462a1c0add226851",
+    "optimized_asm": "37b7f40ab00f1fc1a7da6864dd1b14288f3a300c6ea08fdba8092326864bfcd0",
+    "eight_chunk_asm": "7e5e7a726987ffd777be2aa70adec4c6401116dc1d3f73810cfdf0e798670a34",
+    "double_lds_bank_asm": "3f88d2b2f984c0e78a303de073986ffb3be77cf2018524924c7ae8c024def3a2"
+  },
+  "mode": "benchmark",
+  "repeats": 31,
+  "launches_per_sample": 7,
+  "validation": {
+    "tutorial_baseline": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "passed": true
+    },
+    "previous_best_asm": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "a_direct_gluon": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "optimized_asm": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "eight_chunk_asm": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    },
+    "double_lds_bank_asm": {
+      "finite": true,
+      "max_abs_error": 0.15283203125,
+      "outside_tolerance": 0,
+      "tolerance": "abs_error <= 0.015625 + 0.001 * abs(FP32 reference)",
+      "guards_intact": true,
+      "inputs_unchanged": true,
+      "changed_elements_vs_tutorial": 0,
+      "bitwise_equal_to_tutorial": true,
+      "passed": true
+    }
+  },
+  "source_validation": null,
+  "pairs": [
+    {
+      "round": 0,
+      "order": [
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm"
+      ],
+      "tutorial_baseline": 9.280562264578682,
+      "previous_best_asm": 9.24130358014788,
+      "a_direct_gluon": 8.543203626360212,
+      "optimized_asm": 8.465482439313616,
+      "eight_chunk_asm": 8.404206957135882,
+      "double_lds_bank_asm": 8.200901576450892
+    },
+    {
+      "round": 1,
+      "order": [
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline"
+      ],
+      "previous_best_asm": 9.159674508231026,
+      "a_direct_gluon": 8.555706024169922,
+      "optimized_asm": 8.380063738141741,
+      "eight_chunk_asm": 8.398373195103236,
+      "double_lds_bank_asm": 8.24875967843192,
+      "tutorial_baseline": 9.72992924281529
+    },
+    {
+      "round": 2,
+      "order": [
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm"
+      ],
+      "a_direct_gluon": 8.527786799839564,
+      "optimized_asm": 8.453259604317802,
+      "eight_chunk_asm": 8.390858786446708,
+      "double_lds_bank_asm": 8.241406032017299,
+      "tutorial_baseline": 9.718466622488839,
+      "previous_best_asm": 9.233790806361608
+    },
+    {
+      "round": 3,
+      "order": [
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon"
+      ],
+      "optimized_asm": 8.437076568603516,
+      "eight_chunk_asm": 8.355366843087333,
+      "double_lds_bank_asm": 8.223502567836217,
+      "tutorial_baseline": 9.717694963727679,
+      "previous_best_asm": 9.203893389020648,
+      "a_direct_gluon": 8.534483773367745
+    },
+    {
+      "round": 4,
+      "order": [
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm"
+      ],
+      "eight_chunk_asm": 8.425814492361885,
+      "double_lds_bank_asm": 8.244754246303014,
+      "tutorial_baseline": 9.735471452985491,
+      "previous_best_asm": 9.236539568219866,
+      "a_direct_gluon": 8.543164389474052,
+      "optimized_asm": 8.438980647495814
+    },
+    {
+      "round": 5,
+      "order": [
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm"
+      ],
+      "double_lds_bank_asm": 8.286766597202845,
+      "tutorial_baseline": 9.762673514229911,
+      "previous_best_asm": 9.25664302280971,
+      "a_direct_gluon": 8.58290263584682,
+      "optimized_asm": 8.471089499337333,
+      "eight_chunk_asm": 8.38979721069336
+    },
+    {
+      "round": 6,
+      "order": [
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline"
+      ],
+      "double_lds_bank_asm": 8.29279545375279,
+      "eight_chunk_asm": 8.40204838344029,
+      "optimized_asm": 8.429386138916016,
+      "a_direct_gluon": 8.541639600481306,
+      "previous_best_asm": 9.225226266043526,
+      "tutorial_baseline": 9.7489013671875
+    },
+    {
+      "round": 7,
+      "order": [
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm"
+      ],
+      "tutorial_baseline": 9.770491463797432,
+      "double_lds_bank_asm": 8.293081556047712,
+      "eight_chunk_asm": 8.414437430245536,
+      "optimized_asm": 8.46742194039481,
+      "a_direct_gluon": 8.576200212751116,
+      "previous_best_asm": 9.240827287946429
+    },
+    {
+      "round": 8,
+      "order": [
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon"
+      ],
+      "previous_best_asm": 9.245643615722656,
+      "tutorial_baseline": 9.754560198102679,
+      "double_lds_bank_asm": 8.305688040597099,
+      "eight_chunk_asm": 8.407529558454241,
+      "optimized_asm": 8.49191393171038,
+      "a_direct_gluon": 8.561000279017858
+    },
+    {
+      "round": 9,
+      "order": [
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm"
+      ],
+      "a_direct_gluon": 8.587538037981306,
+      "previous_best_asm": 9.258090427943639,
+      "tutorial_baseline": 9.772983006068639,
+      "double_lds_bank_asm": 8.268070765904017,
+      "eight_chunk_asm": 8.427387237548828,
+      "optimized_asm": 8.490222930908203
+    },
+    {
+      "round": 10,
+      "order": [
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm"
+      ],
+      "optimized_asm": 8.472439902169365,
+      "a_direct_gluon": 8.566418239048549,
+      "previous_best_asm": 9.273319789341517,
+      "tutorial_baseline": 9.764143807547432,
+      "double_lds_bank_asm": 8.298117501395089,
+      "eight_chunk_asm": 8.476839882986885
+    },
+    {
+      "round": 11,
+      "order": [
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm"
+      ],
+      "eight_chunk_asm": 8.425428118024554,
+      "optimized_asm": 8.509051731654576,
+      "a_direct_gluon": 8.594933646065849,
+      "previous_best_asm": 9.284771510532924,
+      "tutorial_baseline": 9.768549237932477,
+      "double_lds_bank_asm": 8.30064937046596
+    },
+    {
+      "round": 12,
+      "order": [
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm"
+      ],
+      "tutorial_baseline": 9.809510367257255,
+      "previous_best_asm": 9.302217755998884,
+      "a_direct_gluon": 8.635751451764788,
+      "optimized_asm": 8.501212528773717,
+      "eight_chunk_asm": 8.455806187220983,
+      "double_lds_bank_asm": 8.32530757359096
+    },
+    {
+      "round": 13,
+      "order": [
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline"
+      ],
+      "previous_best_asm": 9.281178065708705,
+      "a_direct_gluon": 8.610882895333427,
+      "optimized_asm": 8.495207105364118,
+      "eight_chunk_asm": 8.464938027518135,
+      "double_lds_bank_asm": 8.31749016898019,
+      "tutorial_baseline": 9.803729466029576
+    },
+    {
+      "round": 14,
+      "order": [
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm"
+      ],
+      "a_direct_gluon": 8.619020734514509,
+      "optimized_asm": 8.548842293875557,
+      "eight_chunk_asm": 8.420389447893415,
+      "double_lds_bank_asm": 8.303959437779017,
+      "tutorial_baseline": 9.79111807686942,
+      "previous_best_asm": 9.313573564801898
+    },
+    {
+      "round": 15,
+      "order": [
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon"
+      ],
+      "optimized_asm": 8.550122942243304,
+      "eight_chunk_asm": 8.502247946602958,
+      "double_lds_bank_asm": 8.374640328543526,
+      "tutorial_baseline": 9.828072684151786,
+      "previous_best_asm": 9.307379586356026,
+      "a_direct_gluon": 8.659828186035156
+    },
+    {
+      "round": 16,
+      "order": [
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm"
+      ],
+      "eight_chunk_asm": 8.442179543631417,
+      "double_lds_bank_asm": 8.329200744628906,
+      "tutorial_baseline": 9.852610996791295,
+      "previous_best_asm": 9.31976318359375,
+      "a_direct_gluon": 8.634290967668806,
+      "optimized_asm": 8.501146044049944
+    },
+    {
+      "round": 17,
+      "order": [
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm"
+      ],
+      "double_lds_bank_asm": 8.325680324009486,
+      "tutorial_baseline": 9.870028904506139,
+      "previous_best_asm": 9.309175763811384,
+      "a_direct_gluon": 8.638680049351283,
+      "optimized_asm": 8.557804652622767,
+      "eight_chunk_asm": 8.481603349958148
+    },
+    {
+      "round": 18,
+      "order": [
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline"
+      ],
+      "double_lds_bank_asm": 8.334309714181083,
+      "eight_chunk_asm": 8.458472115652901,
+      "optimized_asm": 8.510947091238839,
+      "a_direct_gluon": 8.654091971261161,
+      "previous_best_asm": 9.309776306152344,
+      "tutorial_baseline": 9.889549255371094
+    },
+    {
+      "round": 19,
+      "order": [
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm"
+      ],
+      "tutorial_baseline": 9.879305158342634,
+      "double_lds_bank_asm": 8.35064206804548,
+      "eight_chunk_asm": 8.453352791922432,
+      "optimized_asm": 8.583754403250557,
+      "a_direct_gluon": 8.65250996180943,
+      "previous_best_asm": 9.32725088936942
+    },
+    {
+      "round": 20,
+      "order": [
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon"
+      ],
+      "previous_best_asm": 9.346948896135602,
+      "tutorial_baseline": 9.894659859793526,
+      "double_lds_bank_asm": 8.384112221854073,
+      "eight_chunk_asm": 8.482188088553292,
+      "optimized_asm": 8.53014864240374,
+      "a_direct_gluon": 8.660693577357701
+    },
+    {
+      "round": 21,
+      "order": [
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm"
+      ],
+      "a_direct_gluon": 8.66480200631278,
+      "previous_best_asm": 9.340972900390625,
+      "tutorial_baseline": 9.897397722516741,
+      "double_lds_bank_asm": 8.35872323172433,
+      "eight_chunk_asm": 8.513462611607142,
+      "optimized_asm": 8.561115264892578
+    },
+    {
+      "round": 22,
+      "order": [
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm",
+        "eight_chunk_asm"
+      ],
+      "optimized_asm": 8.558412279401507,
+      "a_direct_gluon": 8.678682599748884,
+      "previous_best_asm": 9.388938903808594,
+      "tutorial_baseline": 9.894187927246094,
+      "double_lds_bank_asm": 8.391187395368304,
+      "eight_chunk_asm": 8.486194610595703
+    },
+    {
+      "round": 23,
+      "order": [
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline",
+        "double_lds_bank_asm"
+      ],
+      "eight_chunk_asm": 8.501692635672432,
+      "optimized_asm": 8.566864558628627,
+      "a_direct_gluon": 8.677334921700615,
+      "previous_best_asm": 9.346539088657924,
+      "tutorial_baseline": 9.931639535086495,
+      "double_lds_bank_asm": 8.390942709786552
+    },
+    {
+      "round": 24,
+      "order": [
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm"
+      ],
+      "tutorial_baseline": 9.920131138392858,
+      "previous_best_asm": 9.413318089076451,
+      "a_direct_gluon": 8.68471908569336,
+      "optimized_asm": 8.594249180385045,
+      "eight_chunk_asm": 8.515196663992745,
+      "double_lds_bank_asm": 8.373194013323102
+    },
+    {
+      "round": 25,
+      "order": [
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline"
+      ],
+      "previous_best_asm": 9.37700435093471,
+      "a_direct_gluon": 8.687701633998326,
+      "optimized_asm": 8.584386008126396,
+      "eight_chunk_asm": 8.510676792689733,
+      "double_lds_bank_asm": 8.37667465209961,
+      "tutorial_baseline": 9.928480965750557
+    },
+    {
+      "round": 26,
+      "order": [
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm"
+      ],
+      "a_direct_gluon": 8.723600115094866,
+      "optimized_asm": 8.575186593191964,
+      "eight_chunk_asm": 8.538969312395368,
+      "double_lds_bank_asm": 8.390075138636998,
+      "tutorial_baseline": 9.932859148297991,
+      "previous_best_asm": 9.425371442522321
+    },
+    {
+      "round": 27,
+      "order": [
+        "optimized_asm",
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon"
+      ],
+      "optimized_asm": 8.580301557268415,
+      "eight_chunk_asm": 8.504386356898717,
+      "double_lds_bank_asm": 8.383807591029576,
+      "tutorial_baseline": 9.925459725516182,
+      "previous_best_asm": 9.419875008719307,
+      "a_direct_gluon": 8.720904214041573
+    },
+    {
+      "round": 28,
+      "order": [
+        "eight_chunk_asm",
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm"
+      ],
+      "eight_chunk_asm": 8.554878779820033,
+      "double_lds_bank_asm": 8.38352802821568,
+      "tutorial_baseline": 9.933346339634486,
+      "previous_best_asm": 9.413989475795201,
+      "a_direct_gluon": 8.755728040422712,
+      "optimized_asm": 8.595331464494977
+    },
+    {
+      "round": 29,
+      "order": [
+        "double_lds_bank_asm",
+        "tutorial_baseline",
+        "previous_best_asm",
+        "a_direct_gluon",
+        "optimized_asm",
+        "eight_chunk_asm"
+      ],
+      "double_lds_bank_asm": 8.399259839739118,
+      "tutorial_baseline": 9.955780029296875,
+      "previous_best_asm": 9.431361607142858,
+      "a_direct_gluon": 8.72906494140625,
+      "optimized_asm": 8.603006090436663,
+      "eight_chunk_asm": 8.56869125366211
+    },
+    {
+      "round": 30,
+      "order": [
+        "double_lds_bank_asm",
+        "eight_chunk_asm",
+        "optimized_asm",
+        "a_direct_gluon",
+        "previous_best_asm",
+        "tutorial_baseline"
+      ],
+      "double_lds_bank_asm": 8.404369354248047,
+      "eight_chunk_asm": 8.54498291015625,
+      "optimized_asm": 8.627898624965123,
+      "a_direct_gluon": 8.718151637486049,
+      "previous_best_asm": 9.434328351702009,
+      "tutorial_baseline": 10.009702410016741
+    }
+  ],
+  "median_ms": {
+    "tutorial_baseline": 9.828072684151786,
+    "previous_best_asm": 9.309175763811384,
+    "a_direct_gluon": 8.635751451764788,
+    "optimized_asm": 8.510947091238839,
+    "eight_chunk_asm": 8.458472115652901,
+    "double_lds_bank_asm": 8.325680324009486
+  },
+  "tflops": {
+    "tutorial_baseline": 111.87459261967123,
+    "previous_best_asm": 118.11052403267068,
+    "a_direct_gluon": 127.32089777216846,
+    "optimized_asm": 129.18792890956124,
+    "eight_chunk_asm": 129.98938966072714,
+    "double_lds_bank_asm": 132.062676560526
+  },
+  "paired_speedup_vs_tutorial": {
+    "tutorial_baseline": 1.0,
+    "previous_best_asm": 1.0556154189821805,
+    "a_direct_gluon": 1.1395626970470647,
+    "optimized_asm": 1.1540306603989936,
+    "eight_chunk_asm": 1.162558429401306,
+    "double_lds_bank_asm": 1.180807961298655
+  },
+  "optimized_paired_speedup": {
+    "tutorial_baseline": 1.1540306603989936,
+    "previous_best_asm": 1.0927334699431317,
+    "a_direct_gluon": 1.0128308381684006,
+    "optimized_asm": 1.0,
+    "eight_chunk_asm": 0.9927617259126106,
+    "double_lds_bank_asm": 0.9770994102098443
+  },
+  "paired_speedup_vs_eight_chunk_asm": {
+    "tutorial_baseline": 0.860171819935949,
+    "previous_best_asm": 0.9087122464011029,
+    "a_direct_gluon": 0.9802784366905634,
+    "optimized_asm": 0.9927617259126106,
+    "eight_chunk_asm": 1.0,
+    "double_lds_bank_asm": 1.0159970568460046
+  }
+}
